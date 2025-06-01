@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Table(name="book")
 public class Book {
 
-    //define fields
+    //------------define fields------------
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
