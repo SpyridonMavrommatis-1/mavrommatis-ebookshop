@@ -10,4 +10,5 @@ public class EbookshopApplication {
 		SpringApplication.run(EbookshopApplication.class, args);
 	}
 
+
 }

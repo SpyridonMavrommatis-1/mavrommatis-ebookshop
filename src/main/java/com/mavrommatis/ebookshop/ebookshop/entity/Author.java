@@ -1,14 +1,27 @@
 package com.mavrommatis.ebookshop.ebookshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="author")
+@Table(name = "author")
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString(exclude = {"authorDetails"})
 public class Author {
 
     //============DEFINE FIELDS=============//
+
+    private static final Logger logger = LoggerFactory.getLogger(Author.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,71 +42,34 @@ public class Author {
 
     //See relevant book-book_details relation comments.
     @OneToOne(mappedBy = "author", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private AuthorDetails authorDetails;
 
+
     //=============GENERATE CONSTRUCTORS=================//
+    //See Book Notes
 
-
-    public Author() {
-
-    }
 
     public Author(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
+        logger.info("New Author created: {}, {}", firstName, lastName);
     }
 
-    //===========GENERATE GETTERS AND SETTERS=============//
+    //===========INSTEAD OF GETTERS AND SETTERS=============//
+    //See Book Notes
 
-
-    public int getAuthorId() {
-        return authorId;
-    }
-
-    public void setAuthorId(int authorId) {
-        this.authorId = authorId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public AuthorDetails getAuthorDetails() {
-        return authorDetails;
-    }
-
-    public void setAuthorDetails(AuthorDetails authorDetails) {
-        this.authorDetails = authorDetails;
-    }
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        logger.info("Author persisted with name: {}, createdAt: {}", firstName, createdAt);
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+        logger.info("Author updated with name: {}, updatedAt: {}", firstName, createdAt);
     }
 
     protected void setCreatedAt(LocalDateTime createdAt) {
@@ -104,17 +80,7 @@ public class Author {
         this.updatedAt = updatedAt;
     }
 
-    //=============GENERATE ΤOSTRING===============//
+    //=============INSTEAD OF ΤOSTRING===============//
+    //See Book Notes
 
-
-    @Override
-    public String toString() {
-        return "Author{" +
-                "authorId=" + authorId +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
 }

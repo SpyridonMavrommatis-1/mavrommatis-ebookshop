@@ -1,14 +1,29 @@
 package com.mavrommatis.ebookshop.ebookshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 
+
+
 @Entity
-@Table(name="customer")
+@Table(name = "customer")
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString(exclude = {"customerDetails"})
 public class Customer {
 
-    //------------define fields------------
+    //============DEFINE FIELDS=============//
+
+    private static final Logger logger = LoggerFactory.getLogger(Customer.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,79 +47,34 @@ public class Customer {
 
     //See relevant book-book_details relation comments.
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private CustomerDetails customerDetails;
 
     //=============GENERATE CONSTRUCTORS=================//
+    //See Book Notes
 
-    public Customer() {
-
-    }
 
     public Customer(String email, String password, String username) {
         this.email = email;
         this.password = password;
         this.username = username;
+        logger.info("New Customer created with email: {}", email);
     }
 
-    //===========GENERATE GETTERS AND SETTERS=============//
+    //===========INSTEAD OF GETTERS AND SETTERS=============//
+    //See Book Notes
 
-
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public CustomerDetails getCustomerDetails() {
-        return customerDetails;
-    }
-
-    public void setCustomerDetails(CustomerDetails customerDetails) {
-        this.customerDetails = customerDetails;
-    }
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        logger.info("Customer persisted with email: {}, createdAt: {}", email, createdAt);
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+        logger.info("Customer updated with email: {}, updatedAt: {}", email, updatedAt);
     }
 
     protected void setCreatedAt(LocalDateTime createdAt) {
@@ -115,17 +85,6 @@ public class Customer {
         this.updatedAt = updatedAt;
     }
 
-    //=============GENERATE ΤOSTRING===============//
-
-
-    @Override
-    public String toString() {
-        return "Customer{" +
-                "username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
+    //=============INSTEAD OF ΤOSTRING===============//
+    //See Book Notes
 }

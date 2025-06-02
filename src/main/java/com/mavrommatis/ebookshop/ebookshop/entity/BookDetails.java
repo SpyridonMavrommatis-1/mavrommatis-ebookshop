@@ -1,16 +1,29 @@
 package com.mavrommatis.ebookshop.ebookshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="book_details")
+@Table(name = "book_details")
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString(exclude = "book")
 public class BookDetails {
 
-    //------------define fields------------
+    //============DEFINE FIELDS=============//
+
+    private static final Logger logger = LoggerFactory.getLogger(BookDetails.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,8 +64,51 @@ public class BookDetails {
     @OneToOne
     @MapsId
     @JoinColumn(name = "book_id")
+    @JsonBackReference  // => Here the reference is "cut" to avoid a circular loop
     private Book book;
 
     //ΝΟΤΕ: delete a book record means deleting automatically the bookDetail record (bookDetails is dependent).
     // but delete a bookDetails record means that the book record will not be deleted (book is independent as the owner).
+
+
+    //=============GENERATE CONSTRUCTORS=================//
+    //See Book Notes
+
+    public BookDetails(BigDecimal weight, String coverType, String dimensions,
+                       String summary, int pages, LocalDate publishDate, String isbn) {
+        this.weight = weight;
+        this.coverType = coverType;
+        this.dimensions = dimensions;
+        this.summary = summary;
+        this.pages = pages;
+        this.publishDate = publishDate;
+        this.isbn = isbn;
+        logger.info("New BookDetails created: {}", isbn);
+    }
+
+    //===========INSTEAD OF GETTERS AND SETTERS=============//
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        logger.info("BookDetails persisted with isbn: {}, createdAt: {}", isbn, createdAt);
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+        logger.info("BookDetails updated for isbn: {}, updatedAt: {}", isbn, updatedAt);
+    }
+
+    protected void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    protected void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    //=============INSTEAD OF ΤOSTRING===============//
+    //See Book Notes
+
 }
