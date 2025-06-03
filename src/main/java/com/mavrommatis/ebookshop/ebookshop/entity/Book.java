@@ -1,5 +1,6 @@
 package com.mavrommatis.ebookshop.ebookshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -49,6 +50,7 @@ public class Book {
     // Many-to-One with Author
     @ManyToOne
     @JoinColumn(name = "author_id")
+    @JsonBackReference
     private Author author;
 
     //A book has a detail (BookDetails).
@@ -78,7 +80,7 @@ public class Book {
         this.language = language;
         this.genre = genre;
         this.literaryForm = literaryForm;
-        this.author = author;
+        author.addBook(this);
         logger.info("New Book created: {}", title);
     }
     /**

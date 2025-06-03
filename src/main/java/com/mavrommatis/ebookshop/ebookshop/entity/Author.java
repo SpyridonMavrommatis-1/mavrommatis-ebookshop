@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "author")
@@ -46,6 +48,18 @@ public class Author {
     private AuthorDetails authorDetails;
 
 
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Book> books = new ArrayList<>();
+    /**
+     * !!!Note: Here, within the existing OneToOne relations, we are now adding a OneToMany bidirectional relation.
+     * This means that:
+     * - One Author can have many Books (List<Book>).
+     * - Each Book will reference back to its Author via a @ManyToOne field.
+     * - The relation is bidirectional: both Author and Book are aware of each other.
+     */
+
+
     //=============GENERATE CONSTRUCTORS=================//
     //See Book Notes
 
@@ -79,6 +93,21 @@ public class Author {
     protected void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public void addBook(Book book) {
+        if (!books.contains(book)) {
+            books.add(book);
+            book.setAuthor(this);
+        }
+    }
+    /**
+     * !!!Note: Instead of providing a public setter for the bidirectional OneToMany relation,
+     * we define an `addBook` method that:
+     * - Adds the Book to the Author's list only if it doesn't already exist (avoids duplicates).
+     * - Sets the back-reference (`book.setAuthor(this)`) to maintain consistency in the bidirectional mapping.
+     * This ensures referential integrity and encapsulates the relationship logic in one place.
+     */
+
 
     //=============INSTEAD OF ΤOSTRING===============//
     //See Book Notes
