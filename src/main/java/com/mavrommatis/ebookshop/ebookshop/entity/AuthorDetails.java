@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,7 +21,6 @@ public class AuthorDetails {
 
     //============DEFINE FIELDS=============//
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthorDetails.class);
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column (name="author_id")
@@ -58,7 +55,6 @@ public class AuthorDetails {
         this.biography = biography;
         this.birthDate = birthDate;
         this.website = website;
-        logger.info("New AuthorDetails created with biography: {}", biography);
     }
 
     //===========INSTEAD OF GETTERS AND SETTERS=============//
@@ -66,13 +62,11 @@ public class AuthorDetails {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        logger.info("AuthorDetails persisted with biography: {}, createdAt: {}", biography, createdAt);
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-        logger.info("AuthorDetails updated for biography: {}, updatedAt: {}", biography, updatedAt);
     }
 
     protected void setCreatedAt(LocalDateTime createdAt) {

@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +20,6 @@ public class Book {
 
     //============DEFINE FIELDS=============//
 
-    private static final Logger logger = LoggerFactory.getLogger(Book.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -81,7 +78,6 @@ public class Book {
         this.genre = genre;
         this.literaryForm = literaryForm;
         author.addBook(this);
-        logger.info("New Book created: {}", title);
     }
     /**
      * Parameterized constructor for creating Book instances
@@ -97,14 +93,12 @@ public class Book {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        logger.info("Book persisted with title: {}, createdAt: {}", title, createdAt);
     }
 
     // Automatically sets the update timestamp before the entity is updated
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-        logger.info("Book updated with title: {}, updatedAt: {}", title, updatedAt);
     }
 
     // Protected setters to allow JPA/Hibernate lifecycle events to modify timestamps,

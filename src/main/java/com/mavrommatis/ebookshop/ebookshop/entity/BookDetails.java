@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,8 +20,6 @@ import java.time.LocalDateTime;
 public class BookDetails {
 
     //============DEFINE FIELDS=============//
-
-    private static final Logger logger = LoggerFactory.getLogger(BookDetails.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,7 +79,6 @@ public class BookDetails {
         this.pages = pages;
         this.publishDate = publishDate;
         this.isbn = isbn;
-        logger.info("New BookDetails created: {}", isbn);
     }
 
     //===========INSTEAD OF GETTERS AND SETTERS=============//
@@ -91,13 +86,11 @@ public class BookDetails {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        logger.info("BookDetails persisted with isbn: {}, createdAt: {}", isbn, createdAt);
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-        logger.info("BookDetails updated for isbn: {}, updatedAt: {}", isbn, updatedAt);
     }
 
     protected void setCreatedAt(LocalDateTime createdAt) {

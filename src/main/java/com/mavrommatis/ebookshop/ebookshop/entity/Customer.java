@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 
@@ -22,8 +20,6 @@ import java.time.LocalDateTime;
 public class Customer {
 
     //============DEFINE FIELDS=============//
-
-    private static final Logger logger = LoggerFactory.getLogger(Customer.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,31 +46,25 @@ public class Customer {
     @JsonManagedReference
     private CustomerDetails customerDetails;
 
+
     //=============GENERATE CONSTRUCTORS=================//
     //See Book Notes
-
-
     public Customer(String email, String password, String username) {
         this.email = email;
         this.password = password;
         this.username = username;
-        logger.info("New Customer created with email: {}", email);
     }
 
     //===========INSTEAD OF GETTERS AND SETTERS=============//
     //See Book Notes
-
-
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        logger.info("Customer persisted with email: {}, createdAt: {}", email, createdAt);
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-        logger.info("Customer updated with email: {}, updatedAt: {}", email, updatedAt);
     }
 
     protected void setCreatedAt(LocalDateTime createdAt) {
