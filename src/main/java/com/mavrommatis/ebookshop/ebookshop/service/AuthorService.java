@@ -15,9 +15,9 @@ public interface AuthorService {
 
     Author save(Author author);
 
-    public List<Author> saveAll(List<Author> authors);
+    List<Author> saveAll(List<Author> authors);
 
     void deleteById(Integer id);
 
-    public void deleteAllById(List<Integer> ids);
+    void deleteAllById(List<Integer> ids);
 }

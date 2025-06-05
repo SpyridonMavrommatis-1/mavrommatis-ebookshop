@@ -18,12 +18,12 @@ public interface CustomerService {
     Customer save(Customer customer);
 
 
-    public List<Customer> saveAll(List<Customer> customers);
+    List<Customer> saveAll(List<Customer> customers);
 
 
     void deleteById(Integer id);
 
 
-    public void deleteAllById(List<Integer> ids);
+    void deleteAllById(List<Integer> ids);
 
 }

@@ -17,12 +17,12 @@ public interface BookService {
     Book save(Book book);
 
     //Save multiple books at once
-    public List<Book> saveAll(List<Book> books);
+    List<Book> saveAll(List<Book> books);
 
     //Delete an author by ID if it exists
     void deleteById(Integer id);
 
     //Delete multiple authors by ID if they exists
-    public void deleteAllById(List<Integer> ids);
+    void deleteAllById(List<Integer> ids);
 }
 
