@@ -42,7 +42,7 @@ public class AuthorDetails {
     private LocalDateTime updatedAt;
 
     //See relevant book-book_details relation comments.
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "author_id")
     @JsonBackReference

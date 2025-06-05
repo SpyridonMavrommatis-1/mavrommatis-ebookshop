@@ -45,15 +45,19 @@ public class Book {
     private LocalDateTime updatedAt;
 
     // Many-to-One with Author
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     @JsonBackReference
     private Author author;
+    /**
+     * ΝΟΤΕ: We don't always need to load the Author entity at all when retrieving a Book.
+     * Using LAZY prevents Hibernate from fetching the associated Author unless it's explicitly accessed.
+     */
 
     //A book has a detail (BookDetails).
     // The relationship is not held here, but by the book field in the BookDetails class.
     // Whatever I do in book (save, update, delete), affects BookDetails.
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference // => This is where the "parent" reference for serialization starts
     private BookDetails bookDetails;
     /**

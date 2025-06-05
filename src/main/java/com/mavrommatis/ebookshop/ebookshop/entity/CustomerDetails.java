@@ -44,7 +44,7 @@ public class CustomerDetails {
     private LocalDateTime updatedAt;
 
     //See relevant book-book_details relation comments.
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "customer_id")
     @JsonBackReference

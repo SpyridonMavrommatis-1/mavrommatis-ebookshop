@@ -57,7 +57,7 @@ public class BookDetails {
 
     // The @MapsId indicates that we use the same book_id for both Book and BookDetails (shared primary key).
     // @JoinColumn(name = "book_id") indicates that this field is also a foreign key to the book table.
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "book_id")
     @JsonBackReference  // => Here the reference is "cut" to avoid a circular loop

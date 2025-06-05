@@ -42,7 +42,7 @@ public class Customer {
     private LocalDateTime updatedAt;
 
     //See relevant book-book_details relation comments.
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private CustomerDetails customerDetails;
 

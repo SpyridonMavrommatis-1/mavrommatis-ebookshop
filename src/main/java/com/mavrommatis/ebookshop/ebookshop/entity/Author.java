@@ -40,12 +40,12 @@ public class Author {
     private LocalDateTime updatedAt;
 
     //See relevant book-book_details relation comments.
-    @OneToOne(mappedBy = "author", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private AuthorDetails authorDetails;
 
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL) //Is already by default lazy
     @JsonManagedReference
     private List<Book> books = new ArrayList<>();
     /**
