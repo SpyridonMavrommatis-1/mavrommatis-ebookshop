@@ -1,0 +1,18 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: my_mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ebookshop
+      MYSQL_DATABASE: ebookshop_mavrommatis
+      MYSQL_USER: ebookuser
+      MYSQL_PASSWORD: ebookshop
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+
+volumes:
+  mysql_data:
