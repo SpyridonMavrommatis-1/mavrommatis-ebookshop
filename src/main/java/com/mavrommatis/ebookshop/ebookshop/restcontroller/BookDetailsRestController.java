@@ -31,7 +31,11 @@ public class BookDetailsRestController {
                 .orElseThrow(() -> new RuntimeException("BookDetails not found with id: " + id));
     }
 
-    // POST /api/bookdetails
+    /**
+     * Creates BookDetails {@link BookDetails}
+     * @param bookDetails {@link BookDetails}
+     * @return {@link BookDetails}
+     */
     @PostMapping
     public BookDetails createBookDetails(@RequestBody BookDetails bookDetails) {
         return bookDetailsService.save(bookDetails);

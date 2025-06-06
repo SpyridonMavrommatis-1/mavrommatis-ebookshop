@@ -11,6 +11,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * TODO Documentation
+ */
 @Entity
 @Table(name = "book_details")
 @Getter
