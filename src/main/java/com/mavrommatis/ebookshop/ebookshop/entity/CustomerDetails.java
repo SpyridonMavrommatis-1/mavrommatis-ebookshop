@@ -9,7 +9,12 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-
+/**
+ * Represents detailed personal information of a Customer.
+ * <p>
+ * This entity is in a one-to-one relationship with the Customer entity,
+ * sharing the same primary key.
+ */
 @Entity
 @Table(name = "customer_details")
 @Getter
@@ -18,41 +23,68 @@ import java.time.LocalDateTime;
 @ToString(exclude = "customer")
 public class CustomerDetails {
 
-    //============DEFINE FIELDS=============//
-
+    /**
+     * Primary key and foreign key. Shared with the Customer entity.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column (name="customer_id")
+    @Column(name = "customer_id")
     private int customerId;
 
-    @Column (name="first_name")
+    /**
+     * The customer's first name.
+     */
+    @Column(name = "first_name")
     private String firstName;
 
-    @Column (name="last_name")
+    /**
+     * The customer's last name.
+     */
+    @Column(name = "last_name")
     private String lastName;
 
-    @Column (name="address")
+    /**
+     * The customer's street address.
+     */
+    @Column(name = "address")
     private String address;
 
-    @Column (name="phone")
+    /**
+     * The customer's contact phone number.
+     */
+    @Column(name = "phone")
     private String phone;
 
+    /**
+     * Timestamp when the customer details record is created.
+     */
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    /**
+     * Timestamp when the customer details record was last updated.
+     */
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    //See relevant book-book_details relation comments.
+    /**
+     * Back-reference to the main Customer entity.
+     * Uses @MapsId to share primary key and @JsonBackReference to prevent recursion in serialization.
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "customer_id")
     @JsonBackReference
     private Customer customer;
 
-    //=============GENERATE CONSTRUCTORS=================//
-    //See Book Notes
-
+    /**
+     * Constructs a CustomerDetails object with basic personal data.
+     *
+     * @param firstName the first name
+     * @param lastName  the last name
+     * @param address   the address
+     * @param phone     the phone number
+     */
     public CustomerDetails(String firstName, String lastName, String address, String phone) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -60,28 +92,38 @@ public class CustomerDetails {
         this.phone = phone;
     }
 
-
-    //===========INSTEAD OF GETTERS AND SETTERS=============//
-
+    /**
+     * Automatically sets the creation timestamp before the entity is persisted.
+     */
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
+    /**
+     * Automatically sets the update timestamp before the entity is updated.
+     */
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 
+    /**
+     * Protected setter for createdAt to prevent manual override.
+     */
     protected void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
+    /**
+     * Protected setter for updatedAt to prevent manual override.
+     */
     protected void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-
-    //=============INSTEAD OF ΤOSTRING===============//
-    //See Book Notes
+    /**
+     * The @ToString annotation excludes the 'customer' field
+     * to avoid circular references during logging or debugging.
+     */
 }

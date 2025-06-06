@@ -1,4 +1,4 @@
-package com.mavrommatis.ebookshop.ebookshop.restcontroller;
+package com.mavrommatis.ebookshop.ebookshop.controller;
 
 import com.mavrommatis.ebookshop.ebookshop.entity.BookDetails;
 import com.mavrommatis.ebookshop.ebookshop.service.BookDetailsService;

@@ -5,25 +5,55 @@ import com.mavrommatis.ebookshop.ebookshop.entity.BookDetails;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service interface for managing {@link BookDetails} entities.
+ * Defines CRUD operations for working with detailed book information.
+ */
 public interface BookDetailsService {
 
-    //Return all bookdetails from the database
+    /**
+     * Retrieve all book details records from the database.
+     *
+     * @return a list of all {@link BookDetails}
+     */
     List<BookDetails> findAll();
 
-    //Return a record of bookdetails by id
+    /**
+     * Retrieve a specific {@link BookDetails} record by its ID.
+     *
+     * @param id the ID of the book details
+     * @return an {@link Optional} containing the found entity or empty if not found
+     */
     Optional<BookDetails> findById(Integer id);
 
-    //Save a record of bookdetails to the database
+    /**
+     * Save a new {@link BookDetails} record to the database.
+     * If the record already exists, it will be updated.
+     *
+     * @param bookDetails the book details to save
+     * @return the saved {@link BookDetails} entity
+     */
     BookDetails save(BookDetails bookDetails);
 
-    //Save multiple bookdetails at once
+    /**
+     * Save multiple {@link BookDetails} records at once.
+     *
+     * @param bookDetails a list of book details to save
+     * @return a list of saved {@link BookDetails} entities
+     */
     List<BookDetails> saveAll(List<BookDetails> bookDetails);
 
-    //Delete a record of bookdetails by ID if it exists
+    /**
+     * Delete a specific {@link BookDetails} record by its ID if it exists.
+     *
+     * @param id the ID of the book details to delete
+     */
     void deleteById(Integer id);
 
-    //Delete multiple bookdetails by ID if they exists
+    /**
+     * Delete multiple {@link BookDetails} records by their IDs if they exist.
+     *
+     * @param ids a list of IDs representing book details to delete
+     */
     void deleteAllById(List<Integer> ids);
 }
-
-

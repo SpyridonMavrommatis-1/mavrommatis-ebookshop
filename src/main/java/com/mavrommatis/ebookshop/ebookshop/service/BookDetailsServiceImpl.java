@@ -7,25 +7,43 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service implementation for managing {@link BookDetails} entities.
+ * Delegates database operations to {@link BookDetailsRepository}.
+ */
 @Service
-public class BookDetailsServiceImpl implements BookDetailsService{
+public class BookDetailsServiceImpl implements BookDetailsService {
 
     private final BookDetailsRepository bookDetailsRepository;
 
+    /**
+     * Constructor-based dependency injection for the repository.
+     *
+     * @param bookDetailsRepository the repository used for database operations
+     */
     public BookDetailsServiceImpl(BookDetailsRepository bookDetailsRepository) {
         this.bookDetailsRepository = bookDetailsRepository;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<BookDetails> findAll() {
         return bookDetailsRepository.findAll();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<BookDetails> findById(Integer id) {
         return bookDetailsRepository.findById(id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BookDetails save(BookDetails bookDetails) {
         if (bookDetails.getBookId() != 0 && bookDetailsRepository.existsById(bookDetails.getBookId())) {
@@ -34,6 +52,9 @@ public class BookDetailsServiceImpl implements BookDetailsService{
         return bookDetailsRepository.save(bookDetails);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<BookDetails> saveAll(List<BookDetails> booksDetails) {
         for (BookDetails bookDetails : booksDetails) {
@@ -44,6 +65,9 @@ public class BookDetailsServiceImpl implements BookDetailsService{
         return bookDetailsRepository.saveAll(booksDetails);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteById(Integer id) {
         Optional<BookDetails> bookDetails = bookDetailsRepository.findById(id);
@@ -55,6 +79,9 @@ public class BookDetailsServiceImpl implements BookDetailsService{
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteAllById(List<Integer> ids) {
         for (Integer id : ids) {

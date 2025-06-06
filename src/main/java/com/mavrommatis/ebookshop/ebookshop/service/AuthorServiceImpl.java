@@ -7,28 +7,43 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service implementation for managing {@link Author} entities.
+ * Delegates database operations to {@link AuthorRepository}.
+ */
 @Service
-public class AuthorServiceImpl implements AuthorService{
-
-    //See BookServiceImpl notes
+public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepository authorRepository;
 
-
+    /**
+     * Constructor-based injection of AuthorRepository.
+     *
+     * @param authorRepository the repository to access Author data.
+     */
     public AuthorServiceImpl(AuthorRepository authorRepository) {
         this.authorRepository = authorRepository;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Author> findAll() {
         return authorRepository.findAll();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Author> findById(Integer id) {
         return authorRepository.findById(id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Author save(Author author) {
         if (author.getAuthorId() != 0 && authorRepository.existsById(author.getAuthorId())) {
@@ -37,6 +52,9 @@ public class AuthorServiceImpl implements AuthorService{
         return authorRepository.save(author);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Author> saveAll(List<Author> authors) {
         for (Author author : authors) {
@@ -47,11 +65,12 @@ public class AuthorServiceImpl implements AuthorService{
         return authorRepository.saveAll(authors);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteById(Integer id) {
-
         Optional<Author> author = authorRepository.findById(id);
-
         if (author.isPresent()) {
             authorRepository.deleteById(id);
         } else {
@@ -59,6 +78,9 @@ public class AuthorServiceImpl implements AuthorService{
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteAllById(List<Integer> ids) {
         for (Integer id : ids) {
@@ -69,6 +91,4 @@ public class AuthorServiceImpl implements AuthorService{
             }
         }
     }
-
-
 }

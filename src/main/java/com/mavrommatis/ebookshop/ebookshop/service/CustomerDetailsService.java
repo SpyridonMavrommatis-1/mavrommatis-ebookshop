@@ -5,24 +5,54 @@ import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetails;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service interface for managing {@link CustomerDetails} entities.
+ * Provides methods for retrieving, saving, and deleting customer detail records.
+ */
 public interface CustomerDetailsService {
 
-    //See BookDetailsService notes
+    /**
+     * Retrieve all customer details from the database.
+     *
+     * @return a list of all {@link CustomerDetails}
+     */
     List<CustomerDetails> findAll();
 
-
+    /**
+     * Find customer details by their ID.
+     *
+     * @param id the ID of the customer details record
+     * @return an {@link Optional} containing the customer details if found, or empty otherwise
+     */
     Optional<CustomerDetails> findById(Integer id);
 
-
+    /**
+     * Save a new customer details entry to the database.
+     *
+     * @param customerDetails the customer details entity to save
+     * @return the saved {@link CustomerDetails}
+     */
     CustomerDetails save(CustomerDetails customerDetails);
 
-
+    /**
+     * Save a list of customer details entries to the database.
+     *
+     * @param customerDetails a list of customer details entities to save
+     * @return the saved list of {@link CustomerDetails}
+     */
     List<CustomerDetails> saveAll(List<CustomerDetails> customerDetails);
 
-
+    /**
+     * Delete a customer details record by its ID if it exists.
+     *
+     * @param id the ID of the customer details to delete
+     */
     void deleteById(Integer id);
 
-
-   void deleteAllById(List<Integer> ids);
+    /**
+     * Delete multiple customer details records by their IDs if they exist.
+     *
+     * @param ids a list of IDs to delete
+     */
+    void deleteAllById(List<Integer> ids);
 }
-

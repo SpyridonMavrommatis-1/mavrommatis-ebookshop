@@ -1,4 +1,4 @@
-package com.mavrommatis.ebookshop.ebookshop.restcontroller;
+package com.mavrommatis.ebookshop.ebookshop.controller;
 
 import com.mavrommatis.ebookshop.ebookshop.entity.Author;
 import com.mavrommatis.ebookshop.ebookshop.entity.AuthorDetails;

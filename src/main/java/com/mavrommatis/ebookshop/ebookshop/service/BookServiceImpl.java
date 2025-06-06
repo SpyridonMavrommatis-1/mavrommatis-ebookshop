@@ -8,30 +8,53 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation of {@link BookService} interface.
+ * Provides business logic and interaction with the BookRepository.
+ */
 @Service
-public class BookServiceImpl implements BookService{
+public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
-    // Constructor injection
+    /**
+     * Constructor-based injection of {@link BookRepository}.
+     *
+     * @param bookRepository the repository used to access the books
+     */
     @Autowired
     public BookServiceImpl(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
 
-    // Retrieve all books from the database
+    /**
+     * Retrieve all books from the database.
+     *
+     * @return a list of all {@link Book} entities
+     */
     @Override
     public List<Book> findAll() {
         return bookRepository.findAll();
     }
 
-    // Find a book by ID and return an Optional (could be empty)
+    /**
+     * Retrieve a book by its ID.
+     *
+     * @param id the ID of the book
+     * @return an {@link Optional} containing the book if found, or empty otherwise
+     */
     @Override
     public Optional<Book> findById(Integer id) {
         return bookRepository.findById(id);
     }
 
-    // Save a new book if it doesn't already exist
+    /**
+     * Save a new book if it doesn't already exist in the database.
+     *
+     * @param book the book entity to save
+     * @return the saved {@link Book}
+     * @throws RuntimeException if the book already exists
+     */
     @Override
     public Book save(Book book) {
         if (book.getBookId() != 0 && bookRepository.existsById(book.getBookId())) {
@@ -40,7 +63,13 @@ public class BookServiceImpl implements BookService{
         return bookRepository.save(book);
     }
 
-    // Save a list of books, checking each for existence
+    /**
+     * Save multiple books at once, checking each for existence.
+     *
+     * @param books a list of books to save
+     * @return the saved list of books
+     * @throws RuntimeException if any book already exists
+     */
     @Override
     public List<Book> saveAll(List<Book> books) {
         for (Book book : books) {
@@ -51,10 +80,14 @@ public class BookServiceImpl implements BookService{
         return bookRepository.saveAll(books);
     }
 
-    // Delete a book by ID if it exists, otherwise throw exception
+    /**
+     * Delete a book by its ID if it exists.
+     *
+     * @param id the ID of the book to delete
+     * @throws RuntimeException if the book is not found
+     */
     @Override
     public void deleteById(Integer id) {
-
         Optional<Book> book = bookRepository.findById(id);
 
         if (book.isPresent()) {
@@ -64,7 +97,12 @@ public class BookServiceImpl implements BookService{
         }
     }
 
-    // Delete all books by ID if they exist, otherwise throw exception
+    /**
+     * Delete multiple books by their IDs if they exist.
+     *
+     * @param ids a list of book IDs to delete
+     * @throws RuntimeException if any of the books are not found
+     */
     @Override
     public void deleteAllById(List<Integer> ids) {
         for (Integer id : ids) {

@@ -11,6 +11,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents an Author entity in the ebookshop system.
+ * An author can have author details (1-1) and multiple books (1-many).
+ */
 @Entity
 @Table(name = "author")
 @Getter
@@ -19,18 +23,15 @@ import java.util.List;
 @ToString(exclude = {"authorDetails"})
 public class Author {
 
-    //============DEFINE FIELDS=============//
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column (name="author_id")
+    @Column(name = "author_id")
     private int authorId;
 
-    @Column (name="first_name")
+    @Column(name = "first_name")
     private String firstName;
 
-    @Column (name="last_name")
+    @Column(name = "last_name")
     private String lastName;
 
     @Column(name = "created_at")
@@ -39,71 +40,57 @@ public class Author {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    //See relevant book-book_details relation comments.
+    /**
+     * One-to-one relation with AuthorDetails.
+     */
     @OneToOne(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private AuthorDetails authorDetails;
 
-
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL) //Is already by default lazy
+    /**
+     * One-to-many relation with Book.
+     * One author can have multiple books.
+     */
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Book> books = new ArrayList<>();
+
     /**
-     * !!!Note: Here, within the existing OneToOne relations, we are now adding a OneToMany bidirectional relation.
-     * This means that:
-     * - One Author can have many Books (List<Book>).
-     * - Each Book will reference back to its Author via a @ManyToOne field.
-     * - The relation is bidirectional: both Author and Book are aware of each other.
+     * Constructor used to create an Author with first and last name.
+     *
+     * @param firstName the author's first name
+     * @param lastName  the author's last name
      */
-
-
-    //=============GENERATE CONSTRUCTORS=================//
-    //See Book Notes
-
-
     public Author(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
-    //===========INSTEAD OF GETTERS AND SETTERS=============//
-    //See Book Notes
-
-
+    /**
+     * Sets the creation timestamp before persisting the entity.
+     */
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
+    /**
+     * Sets the update timestamp before updating the entity.
+     */
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 
-    protected void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    protected void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
+    /**
+     * Adds a book to the author and sets the author reference in the book.
+     *
+     * @param book the book to be added
+     */
     public void addBook(Book book) {
         if (!books.contains(book)) {
             books.add(book);
             book.setAuthor(this);
         }
     }
-    /**
-     * !!!Note: Instead of providing a public setter for the bidirectional OneToMany relation,
-     * we define an `addBook` method that:
-     * - Adds the Book to the Author's list only if it doesn't already exist (avoids duplicates).
-     * - Sets the back-reference (`book.setAuthor(this)`) to maintain consistency in the bidirectional mapping.
-     * This ensures referential integrity and encapsulates the relationship logic in one place.
-     */
-
-
-    //=============INSTEAD OF ΤOSTRING===============//
-    //See Book Notes
-
 }
