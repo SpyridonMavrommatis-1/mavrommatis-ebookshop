@@ -8,59 +8,99 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * REST controller that provides CRUD operations for {@link Book} entities.
+ * Responds with JSON and is typically used for API clients (e.g., JavaScript frontends).
+ */
 @RestController
 @RequestMapping("/api/books")
 public class BookRestController {
 
     private final BookService bookService;
 
+    /**
+     * Constructs the controller with an injected {@link BookService}.
+     *
+     * @param bookService the service layer for book operations
+     */
     @Autowired
     public BookRestController(BookService bookService) {
         this.bookService = bookService;
     }
 
-    // Τhis method answers the call of ("/api/books") and gets all books
+    /**
+     * Retrieves all books.
+     *
+     * @return a list of all books
+     */
     @GetMapping
     public List<Book> findAll() {
         return bookService.findAll();
     }
 
-    // supplements the GET /api/books/{id}
+    /**
+     * Retrieves a book by its ID.
+     *
+     * @param id the ID of the book
+     * @return the book with the given ID
+     * @throws RuntimeException if the book is not found
+     */
     @GetMapping("/{id}")
     public Book findById(@PathVariable int id) {
         return bookService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
     }
 
-    // POST /api/books
+    /**
+     * Creates a new book.
+     *
+     * @param book the book object sent in the request body
+     * @return the saved book
+     */
     @PostMapping
     public Book createBook(@RequestBody Book book) {
         BookDetails details = book.getBookDetails();
         if (details != null) {
-            details.setBook(book);  // ensure the relationship is maintained because of lazy fetch
+            details.setBook(book); // maintain bidirectional relationship
         }
         return bookService.save(book);
     }
 
-    // PUT /api/books/{id}
+    /**
+     * Updates an existing book with the given ID.
+     *
+     * @param id the ID of the book to update
+     * @param book the updated book object
+     * @return the updated book
+     */
     @PutMapping("/{id}")
     public Book updateBook(@PathVariable int id, @RequestBody Book book) {
         book.setBookId(id);
         BookDetails details = book.getBookDetails();
         if (details != null) {
-            details.setBook(book);  // ensure the relationship is maintained because of lazy fetch
+            details.setBook(book);
         }
         return bookService.save(book);
     }
 
-    // DELETE /api/books/{id}
+    /**
+     * Deletes a book by its ID.
+     *
+     * @param id the ID of the book to delete
+     * @return a confirmation message
+     */
     @DeleteMapping("/{id}")
     public String deleteBook(@PathVariable int id) {
         bookService.deleteById(id);
         return "Book with id " + id + " deleted.";
     }
 
-    // POST /api/books/batch
+    /**
+     * Saves a list of books in batch.
+     *
+     * @param books the list of books to save
+     * @return the list of saved books
+     */
     @PostMapping("/batch")
     public List<Book> saveAllBooks(@RequestBody List<Book> books) {
         for (Book book : books) {
@@ -72,7 +112,12 @@ public class BookRestController {
         return bookService.saveAll(books);
     }
 
-    // DELETE api/books/batch
+    /**
+     * Deletes multiple books by their IDs.
+     *
+     * @param ids the list of book IDs to delete
+     * @return a confirmation message
+     */
     @DeleteMapping("/batch")
     public String deleteAllBooks(@RequestBody List<Integer> ids) {
         bookService.deleteAllById(ids);

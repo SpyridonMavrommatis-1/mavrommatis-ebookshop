@@ -7,57 +7,102 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * REST controller for managing {@link BookDetails} entities.
+ * Provides endpoints for CRUD and batch operations, returning JSON responses.
+ */
 @RestController
 @RequestMapping("/api/bookdetails")
 public class BookDetailsRestController {
 
     private final BookDetailsService bookDetailsService;
 
+    /**
+     * Constructor injection for BookDetailsService.
+     *
+     * @param bookDetailsService the service layer for BookDetails operations
+     */
     @Autowired
     public BookDetailsRestController(BookDetailsService bookDetailsService) {
         this.bookDetailsService = bookDetailsService;
     }
 
-    // GET /api/bookdetails
+    /**
+     * Retrieves all BookDetails entries.
+     *
+     * @return a list of BookDetails
+     */
     @GetMapping
     public List<BookDetails> findAll() {
         return bookDetailsService.findAll();
     }
 
-    // GET /api/bookdetails/{id}
+    /**
+     * Retrieves a specific BookDetails by its ID.
+     *
+     * @param id the ID of the BookDetails
+     * @return the BookDetails object
+     * @throws RuntimeException if the entry is not found
+     */
     @GetMapping("/{id}")
     public BookDetails findById(@PathVariable int id) {
         return bookDetailsService.findById(id)
                 .orElseThrow(() -> new RuntimeException("BookDetails not found with id: " + id));
     }
 
-    // POST /api/bookdetails
+    /**
+     * Creates a new BookDetails entry.
+     *
+     * @param bookDetails the BookDetails object to create
+     * @return the saved BookDetails
+     */
     @PostMapping
     public BookDetails createBookDetails(@RequestBody BookDetails bookDetails) {
         return bookDetailsService.save(bookDetails);
     }
 
-    // PUT /api/bookdetails/{id}
+    /**
+     * Updates an existing BookDetails entry.
+     *
+     * @param id the ID of the BookDetails to update
+     * @param bookDetails the updated BookDetails object
+     * @return the saved BookDetails
+     */
     @PutMapping("/{id}")
     public BookDetails updateBookDetails(@PathVariable int id, @RequestBody BookDetails bookDetails) {
         bookDetails.setBookId(id);
         return bookDetailsService.save(bookDetails);
     }
 
-    // POST /api/bookdetails/batch
+    /**
+     * Saves multiple BookDetails entries in batch.
+     *
+     * @param bookDetailsList list of BookDetails to save
+     * @return the list of saved BookDetails
+     */
     @PostMapping("/batch")
     public List<BookDetails> saveAllBookDetails(@RequestBody List<BookDetails> bookDetailsList) {
         return bookDetailsService.saveAll(bookDetailsList);
     }
 
-    // DELETE /api/bookdetails/{id}
+    /**
+     * Deletes a specific BookDetails entry by ID.
+     *
+     * @param id the ID of the BookDetails to delete
+     * @return a confirmation message
+     */
     @DeleteMapping("/{id}")
     public String deleteBookDetails(@PathVariable int id) {
         bookDetailsService.deleteById(id);
         return "BookDetails with id " + id + " deleted.";
     }
 
-    // DELETE /api/bookdetails/batch
+    /**
+     * Deletes multiple BookDetails entries by their IDs.
+     *
+     * @param ids list of IDs of the BookDetails to delete
+     * @return a confirmation message
+     */
     @DeleteMapping("/batch")
     public String deleteAllBookDetails(@RequestBody List<Integer> ids) {
         bookDetailsService.deleteAllById(ids);

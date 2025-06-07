@@ -7,57 +7,102 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * REST controller for managing CustomerDetails.
+ * Provides CRUD operations and batch actions through RESTful endpoints.
+ */
 @RestController
 @RequestMapping("/api/customerdetails")
 public class CustomerDetailsRestController {
 
     private final CustomerDetailsService customerDetailsService;
 
+    /**
+     * Constructor for dependency injection.
+     *
+     * @param customerDetailsService the service for handling CustomerDetails operations
+     */
     @Autowired
     public CustomerDetailsRestController(CustomerDetailsService customerDetailsService) {
         this.customerDetailsService = customerDetailsService;
     }
 
-    // GET /api/customerdetails
+    /**
+     * Retrieves all CustomerDetails.
+     *
+     * @return a list of all CustomerDetails
+     */
     @GetMapping
     public List<CustomerDetails> findAll() {
         return customerDetailsService.findAll();
     }
 
-    // GET /api/customerdetails/{id}
+    /**
+     * Retrieves a CustomerDetails by ID.
+     *
+     * @param id the ID of the CustomerDetails
+     * @return the CustomerDetails with the given ID
+     * @throws RuntimeException if not found
+     */
     @GetMapping("/{id}")
     public CustomerDetails findById(@PathVariable int id) {
         return customerDetailsService.findById(id)
                 .orElseThrow(() -> new RuntimeException("CustomerDetails not found with id: " + id));
     }
 
-    // POST /api/customerdetails
+    /**
+     * Creates a new CustomerDetails entry.
+     *
+     * @param customerDetails the CustomerDetails to create
+     * @return the created CustomerDetails
+     */
     @PostMapping
     public CustomerDetails createCustomerDetails(@RequestBody CustomerDetails customerDetails) {
         return customerDetailsService.save(customerDetails);
     }
 
-    // PUT /api/customerdetails/{id}
+    /**
+     * Updates an existing CustomerDetails by ID.
+     *
+     * @param id              the ID of the CustomerDetails to update
+     * @param customerDetails the updated CustomerDetails data
+     * @return the updated CustomerDetails
+     */
     @PutMapping("/{id}")
     public CustomerDetails updateCustomerDetails(@PathVariable int id, @RequestBody CustomerDetails customerDetails) {
         customerDetails.setCustomerId(id);
         return customerDetailsService.save(customerDetails);
     }
 
-    // POST /api/customerdetails/batch
+    /**
+     * Saves multiple CustomerDetails entries in batch.
+     *
+     * @param customerDetailsList the list of CustomerDetails to save
+     * @return the saved list of CustomerDetails
+     */
     @PostMapping("/batch")
     public List<CustomerDetails> saveAllCustomerDetails(@RequestBody List<CustomerDetails> customerDetailsList) {
         return customerDetailsService.saveAll(customerDetailsList);
     }
 
-    // DELETE /api/customerdetails/{id}
+    /**
+     * Deletes a CustomerDetails entry by ID.
+     *
+     * @param id the ID of the CustomerDetails to delete
+     * @return a confirmation message
+     */
     @DeleteMapping("/{id}")
     public String deleteCustomerDetails(@PathVariable int id) {
         customerDetailsService.deleteById(id);
         return "CustomerDetails with id " + id + " deleted.";
     }
 
-    // DELETE /api/customerdetails/batch
+    /**
+     * Deletes multiple CustomerDetails entries by their IDs.
+     *
+     * @param ids the list of IDs to delete
+     * @return a confirmation message
+     */
     @DeleteMapping("/batch")
     public String deleteAllCustomerDetails(@RequestBody List<Integer> ids) {
         customerDetailsService.deleteAllById(ids);
