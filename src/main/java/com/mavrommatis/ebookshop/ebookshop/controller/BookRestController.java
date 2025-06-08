@@ -1,7 +1,9 @@
 package com.mavrommatis.ebookshop.ebookshop.controller;
 
+import com.mavrommatis.ebookshop.ebookshop.entity.Author;
 import com.mavrommatis.ebookshop.ebookshop.entity.Book;
 import com.mavrommatis.ebookshop.ebookshop.entity.BookDetails;
+import com.mavrommatis.ebookshop.ebookshop.service.AuthorService;
 import com.mavrommatis.ebookshop.ebookshop.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -9,29 +11,32 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * REST controller that provides CRUD operations for {@link Book} entities.
- * Responds with JSON and is typically used for API clients (e.g., JavaScript frontends).
+ * REST controller that handles HTTP requests for managing {@link Book} entities.
+ * Supports full CRUD operations and ensures bidirectional relationships with {@link Author} and {@link BookDetails}.
  */
 @RestController
 @RequestMapping("/api/books")
 public class BookRestController {
 
     private final BookService bookService;
+    private final AuthorService authorService;
 
     /**
-     * Constructs the controller with an injected {@link BookService}.
+     * Constructor with dependency injection for {@link BookService} and {@link AuthorService}.
      *
-     * @param bookService the service layer for book operations
+     * @param bookService   the service used to manage book entities
+     * @param authorService the service used to manage author entities
      */
     @Autowired
-    public BookRestController(BookService bookService) {
+    public BookRestController(BookService bookService, AuthorService authorService) {
         this.bookService = bookService;
+        this.authorService = authorService;
     }
 
     /**
-     * Retrieves all books.
+     * Retrieves a list of all books from the database.
      *
-     * @return a list of all books
+     * @return a list of all {@link Book} entities
      */
     @GetMapping
     public List<Book> findAll() {
@@ -39,10 +44,10 @@ public class BookRestController {
     }
 
     /**
-     * Retrieves a book by its ID.
+     * Retrieves a single book by its unique ID.
      *
-     * @param id the ID of the book
-     * @return the book with the given ID
+     * @param id the ID of the book to retrieve
+     * @return the {@link Book} entity, if found
      * @throws RuntimeException if the book is not found
      */
     @GetMapping("/{id}")
@@ -52,39 +57,60 @@ public class BookRestController {
     }
 
     /**
-     * Creates a new book.
+     * Creates a new book, assigning it to an existing author and linking any book details.
      *
-     * @param book the book object sent in the request body
-     * @return the saved book
+     * @param book the {@link Book} entity sent in the request body
+     * @return the newly saved {@link Book}
+     * @throws RuntimeException if the author is not found or the ID is missing
      */
     @PostMapping
     public Book createBook(@RequestBody Book book) {
         BookDetails details = book.getBookDetails();
         if (details != null) {
-            details.setBook(book); // maintain bidirectional relationship
+            details.setBook(book); // maintain bidirectional link
         }
+
+        if (book.getAuthor() != null && book.getAuthor().getAuthorId() != 0) {
+            Author managedAuthor = authorService.findById(book.getAuthor().getAuthorId())
+                    .orElseThrow(() -> new RuntimeException("Author not found with id: " + book.getAuthor().getAuthorId()));
+            book.setAuthor(managedAuthor);
+            managedAuthor.addBook(book); // maintain bidirectional link
+        } else {
+            throw new RuntimeException("Author ID is required to create a book.");
+        }
+
         return bookService.save(book);
     }
 
     /**
-     * Updates an existing book with the given ID.
+     * Updates an existing book by its ID and handles relationship updates.
      *
-     * @param id the ID of the book to update
-     * @param book the updated book object
-     * @return the updated book
+     * @param id   the ID of the book to update
+     * @param book the updated {@link Book} data
+     * @return the saved updated {@link Book}
+     * @throws RuntimeException if the author is not found
      */
     @PutMapping("/{id}")
     public Book updateBook(@PathVariable int id, @RequestBody Book book) {
         book.setBookId(id);
+
         BookDetails details = book.getBookDetails();
         if (details != null) {
             details.setBook(book);
         }
+
+        if (book.getAuthor() != null && book.getAuthor().getAuthorId() != 0) {
+            Author managedAuthor = authorService.findById(book.getAuthor().getAuthorId())
+                    .orElseThrow(() -> new RuntimeException("Author not found with id: " + book.getAuthor().getAuthorId()));
+            book.setAuthor(managedAuthor);
+            managedAuthor.addBook(book);
+        }
+
         return bookService.save(book);
     }
 
     /**
-     * Deletes a book by its ID.
+     * Deletes a book by its unique ID.
      *
      * @param id the ID of the book to delete
      * @return a confirmation message
@@ -96,19 +122,30 @@ public class BookRestController {
     }
 
     /**
-     * Saves a list of books in batch.
+     * Saves multiple books in batch, validating authors and book details.
      *
-     * @param books the list of books to save
-     * @return the list of saved books
+     * @param books the list of {@link Book} entities to save
+     * @return the list of saved {@link Book} entities
+     * @throws RuntimeException if any book has missing or invalid author ID
      */
-    @PostMapping("/batch")
+    @PostMapping("/batch-save-all")
     public List<Book> saveAllBooks(@RequestBody List<Book> books) {
         for (Book book : books) {
             BookDetails details = book.getBookDetails();
             if (details != null) {
                 details.setBook(book);
             }
+
+            if (book.getAuthor() != null && book.getAuthor().getAuthorId() != 0) {
+                Author managedAuthor = authorService.findById(book.getAuthor().getAuthorId())
+                        .orElseThrow(() -> new RuntimeException("Author not found with id: " + book.getAuthor().getAuthorId()));
+                book.setAuthor(managedAuthor);
+                managedAuthor.addBook(book);
+            } else {
+                throw new RuntimeException("Author ID is required for book: " + book.getTitle());
+            }
         }
+
         return bookService.saveAll(books);
     }
 
@@ -118,7 +155,7 @@ public class BookRestController {
      * @param ids the list of book IDs to delete
      * @return a confirmation message
      */
-    @DeleteMapping("/batch")
+    @DeleteMapping("/batch-delete-all")
     public String deleteAllBooks(@RequestBody List<Integer> ids) {
         bookService.deleteAllById(ids);
         return "Books with ids " + ids + " deleted.";

@@ -4,6 +4,7 @@ import com.mavrommatis.ebookshop.ebookshop.dao.BookRepository;
 import com.mavrommatis.ebookshop.ebookshop.entity.Book;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -71,6 +72,7 @@ public class BookServiceImpl implements BookService {
      * @throws RuntimeException if any book already exists
      */
     @Override
+    @Transactional
     public List<Book> saveAll(List<Book> books) {
         for (Book book : books) {
             if (book.getBookId() != 0 && bookRepository.existsById(book.getBookId())) {

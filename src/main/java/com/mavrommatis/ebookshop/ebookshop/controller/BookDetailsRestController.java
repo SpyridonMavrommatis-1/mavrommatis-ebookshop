@@ -12,7 +12,7 @@ import java.util.List;
  * Provides endpoints for CRUD and batch operations, returning JSON responses.
  */
 @RestController
-@RequestMapping("/api/bookdetails")
+@RequestMapping("/api/book-details")
 public class BookDetailsRestController {
 
     private final BookDetailsService bookDetailsService;
@@ -80,7 +80,7 @@ public class BookDetailsRestController {
      * @param bookDetailsList list of BookDetails to save
      * @return the list of saved BookDetails
      */
-    @PostMapping("/batch")
+    @PostMapping("/batch-save-all")
     public List<BookDetails> saveAllBookDetails(@RequestBody List<BookDetails> bookDetailsList) {
         return bookDetailsService.saveAll(bookDetailsList);
     }
@@ -91,7 +91,7 @@ public class BookDetailsRestController {
      * @param id the ID of the BookDetails to delete
      * @return a confirmation message
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public String deleteBookDetails(@PathVariable int id) {
         bookDetailsService.deleteById(id);
         return "BookDetails with id " + id + " deleted.";
@@ -103,7 +103,7 @@ public class BookDetailsRestController {
      * @param ids list of IDs of the BookDetails to delete
      * @return a confirmation message
      */
-    @DeleteMapping("/batch")
+    @DeleteMapping("/batch-delete-all")
     public String deleteAllBookDetails(@RequestBody List<Integer> ids) {
         bookDetailsService.deleteAllById(ids);
         return "BookDetails with ids " + ids + " deleted.";
