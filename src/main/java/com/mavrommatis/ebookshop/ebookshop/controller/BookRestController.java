@@ -83,30 +83,21 @@ public class BookRestController {
     }
 
     /**
-     * Updates an existing book by its ID and handles relationship updates.
+     * Updates an existing {@link Book} entity based on the provided ID and request body.
+     * <p>
+     * This method delegates the update logic to the {@link com.mavrommatis.ebookshop.ebookshop.service.BookService},
+     * which ensures that all necessary relationships (e.g., {@link com.mavrommatis.ebookshop.ebookshop.entity.Author},
+     * {@link com.mavrommatis.ebookshop.ebookshop.entity.BookDetails}) are handled appropriately.
      *
-     * @param id   the ID of the book to update
-     * @param book the updated {@link Book} data
-     * @return the saved updated {@link Book}
-     * @throws RuntimeException if the author is not found
+     * @param id   the ID of the book to be updated
+     * @param book the updated {@link Book} object received in the request body
+     * @return the updated {@link Book} entity after persistence
+     * @throws RuntimeException if the book or author does not exist
      */
     @PutMapping("/{id}")
     public Book updateBook(@PathVariable int id, @RequestBody Book book) {
         book.setBookId(id);
-
-        BookDetails details = book.getBookDetails();
-        if (details != null) {
-            details.setBook(book);
-        }
-
-        if (book.getAuthor() != null && book.getAuthor().getAuthorId() != 0) {
-            Author managedAuthor = authorService.findById(book.getAuthor().getAuthorId())
-                    .orElseThrow(() -> new RuntimeException("Author not found with id: " + book.getAuthor().getAuthorId()));
-            book.setAuthor(managedAuthor);
-            managedAuthor.addBook(book);
-        }
-
-        return bookService.save(book);
+        return bookService.update(book);
     }
 
     /**

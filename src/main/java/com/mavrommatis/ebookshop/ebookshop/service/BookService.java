@@ -43,6 +43,17 @@ public interface BookService {
     List<Book> saveAll(List<Book> books);
 
     /**
+     * Update an existing book in the database.
+     * The book must have a valid ID and already exist in the database.
+     *
+     * @param book the {@link Book} entity containing updated fields
+     * @return the updated {@link Book}
+     * @throws RuntimeException if the book does not exist
+     */
+    Book update(Book book);
+
+
+    /**
      * Delete a book by its ID, if it exists.
      *
      * @param id the ID of the book to be deleted

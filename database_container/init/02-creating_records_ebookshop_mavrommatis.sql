@@ -58,6 +58,15 @@ INSERT INTO author_book (author_id, book_id) VALUES
 (5, 4);  -- Eleni Mavri -> Poetic Collection (Jack Mavros also author)
 
 
+-- Insert records into table: book_reviews
+INSERT INTO book_reviews (book_id, customer_id, rating, comment) VALUES
+(1, 1, 5, 'A masterpiece of dystopian literature.'),    -- Alice reviews 1984
+(3, 2, 4, 'Exciting and imaginative!'),                 -- Bob reviews Harry Potter
+(2, 1, 3, NULL),                                        -- Alice reviews Mrs Dalloway (rating required, comment optional)
+(4, 1, 5, 'Loved this collection!'),                    -- Alice reviews Poetic Collection
+(3, 2, 1, 'Received wrong edition, disappointed.');     -- Bob reviews Harry Potter again (for another order)
+
+
 -- Insert records into table: orders
 INSERT INTO orders (customer_id, order_date, status, total_amount) VALUES
 (1, '2024-05-27 09:00:00', 'completed', 19.98),     -- Alice: paid online, order completed
@@ -79,12 +88,3 @@ INSERT INTO payment (order_id, amount, payment_method, payment_status, payment_d
 (2, 14.50, 'PayPal', 'pending', NULL),                          -- Bob chose PayPal, but hasn't completed payment
 (3, 25.00, 'Bank Transfer', 'pending', NULL),                   -- Alice: awaiting confirmation for bank transfer
 (4, 35.00, 'Wallet', 'failed', '2024-05-28 14:00:00');          -- Bob tried to pay with Wallet, failed (e.g. not enough balance)
-
--- Insert records into table: book_reviews
-INSERT INTO book_reviews (book_id, customer_id, rating, comment) VALUES
-(1, 1, 5, 'A masterpiece of dystopian literature.'),    -- Alice reviews 1984
-(3, 2, 4, 'Exciting and imaginative!'),                 -- Bob reviews Harry Potter
-(2, 1, 3, NULL),                                        -- Alice reviews Mrs Dalloway (rating required, comment optional)
-(4, 1, 5, 'Loved this collection!'),                    -- Alice reviews Poetic Collection
-(3, 2, 1, 'Received wrong edition, disappointed.');     -- Bob reviews Harry Potter again (for another order)
-

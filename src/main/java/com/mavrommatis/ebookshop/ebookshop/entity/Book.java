@@ -76,10 +76,16 @@ public class Book {
     private Author author;
 
     /**
-     * One-to-One relationship with {@link BookDetails}.
-     * This is the parent side of the relationship.
+     * Represents the one-to-one association with {@link BookDetails}, where this entity is the parent.
+     * <p>
+     * Cascade operations ensure that any changes to the {@link Book} (such as persist, merge, or delete)
+     * are propagated to the associated {@link BookDetails}. The {@code orphanRemoval=true} flag ensures
+     * that removing the reference to {@link BookDetails} from this {@link Book} will also delete the orphaned
+     * {@link BookDetails} record from the database.
+     * <p>
+     * This relationship is bidirectional and mapped by the {@code book} field in the {@link BookDetails} entity.
      */
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
     private BookDetails bookDetails;
 

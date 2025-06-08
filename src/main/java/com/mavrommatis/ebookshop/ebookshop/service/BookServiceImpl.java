@@ -1,7 +1,9 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
 import com.mavrommatis.ebookshop.ebookshop.dao.BookRepository;
+import com.mavrommatis.ebookshop.ebookshop.entity.Author;
 import com.mavrommatis.ebookshop.ebookshop.entity.Book;
+import com.mavrommatis.ebookshop.ebookshop.entity.BookDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,14 +20,18 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
+    private final AuthorService authorService;
+
     /**
-     * Constructor-based injection of {@link BookRepository}.
+     * Constructor-based injection of dependencies.
      *
-     * @param bookRepository the repository used to access the books
+     * @param bookRepository the repository used to access books
+     * @param authorService the service used to manage authors
      */
     @Autowired
-    public BookServiceImpl(BookRepository bookRepository) {
+    public BookServiceImpl(BookRepository bookRepository, AuthorService authorService) {
         this.bookRepository = bookRepository;
+        this.authorService = authorService;
     }
 
     /**
@@ -80,6 +86,65 @@ public class BookServiceImpl implements BookService {
             }
         }
         return bookRepository.saveAll(books);
+    }
+
+    /**
+     * Updates an existing {@link Book} in the database, ensuring safe merging of nested entities.
+     * <p>
+     * This method retrieves the managed instance of the book from the database, then updates its fields
+     * and relationships (such as {@link BookDetails} and {@link Author}) carefully, avoiding conflicts
+     * caused by multiple objects with the same identifier in the persistence context.
+     *
+     * @param book the {@link Book} entity containing updated values (from client input)
+     * @return the updated and saved {@link Book} entity
+     * @throws RuntimeException if the book or the associated author does not exist
+     */
+    @Override
+    public Book update(Book book) {
+        int bookId = book.getBookId();
+
+        if (bookId == 0 || !bookRepository.existsById(bookId)) {
+            throw new RuntimeException("Cannot update. Book not found with id: " + bookId);
+        }
+
+        // Fetch the managed Book entity from the database
+        Book existingBook = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
+
+        // Update primitive fields of Book
+        existingBook.setTitle(book.getTitle());
+        existingBook.setLanguage(book.getLanguage());
+        existingBook.setGenre(book.getGenre());
+        existingBook.setLiteraryForm(book.getLiteraryForm());
+
+        // Handle BookDetails relationship carefully to avoid NonUniqueObjectException
+        BookDetails newDetails = book.getBookDetails();
+        if (newDetails != null) {
+            BookDetails managedDetails = existingBook.getBookDetails();
+            if (managedDetails == null) {
+                newDetails.setBook(existingBook);
+                existingBook.setBookDetails(newDetails);
+            } else {
+                managedDetails.setSummary(newDetails.getSummary());
+                managedDetails.setIsbn(newDetails.getIsbn());
+                managedDetails.setPages(newDetails.getPages());
+                managedDetails.setDimensions(newDetails.getDimensions());
+                managedDetails.setCoverType(newDetails.getCoverType());
+                managedDetails.setWeight(newDetails.getWeight());
+                managedDetails.setPublishDate(newDetails.getPublishDate());
+            }
+        }
+
+        // Handle Author relationship
+        if (book.getAuthor() != null && book.getAuthor().getAuthorId() != 0) {
+            Author managedAuthor = authorService.findById(book.getAuthor().getAuthorId())
+                    .orElseThrow(() -> new RuntimeException("Author not found with id: " + book.getAuthor().getAuthorId()));
+            existingBook.setAuthor(managedAuthor);
+            managedAuthor.addBook(existingBook); // maintain bidirectional consistency
+        }
+
+        // Save the updated Book
+        return bookRepository.save(existingBook);
     }
 
     /**
