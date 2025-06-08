@@ -55,7 +55,7 @@ public class AuthorController {
         Author author = authorService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Author not found with id: " + id));
         model.addAttribute("author", author);
-        return "author-details";
+        return "author-by-id";
     }
 
     /**
@@ -64,7 +64,7 @@ public class AuthorController {
      * @param model the Spring model
      * @return the name of the HTML view
      */
-    @GetMapping("/new")
+    @GetMapping("/find/create-new")
     public String showCreateForm(Model model) {
         model.addAttribute("author", new Author());
         return "author-form";
@@ -93,7 +93,7 @@ public class AuthorController {
      * @param model the Spring model
      * @return the name of the HTML view
      */
-    @GetMapping("/update/{id}")
+    @GetMapping("/get-edit/{id}")
     public String showUpdateForm(@PathVariable int id, Model model) {
         Author author = authorService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Author not found with id: " + id));
@@ -119,6 +119,37 @@ public class AuthorController {
         return "redirect:/authors";
     }
 
+
+    /**
+     * Shows a form to add multiple authors.
+     *
+     * @param model the Spring model
+     * @return the name of the HTML view
+     */
+    @GetMapping("/batch-create-many")
+    public String showBatchSaveForm(Model model) {
+        model.addAttribute("authorList", List.of(new Author(), new Author())); // Example with 2 empty rows
+        return "author-batch-form";
+    }
+
+    /**
+     * Saves multiple authors from form data.
+     *
+     * @param authors the list of authors
+     * @return redirection to the author list
+     */
+    @PostMapping("/batch-save-all")
+    public String saveAllAuthors(@ModelAttribute("authorList") List<Author> authors) {
+        for (Author author : authors) {
+            AuthorDetails details = author.getAuthorDetails();
+            if (details != null) {
+                details.setAuthor(author);
+            }
+        }
+        authorService.saveAll(authors);
+        return "redirect:/authors";
+    }
+
     /**
      * Deletes an author by ID.
      *
@@ -132,46 +163,16 @@ public class AuthorController {
     }
 
     /**
-     * Shows a form to add multiple authors.
-     *
-     * @param model the Spring model
-     * @return the name of the HTML view
-     */
-    @GetMapping("/batch-save")
-    public String showBatchSaveForm(Model model) {
-        model.addAttribute("authorList", List.of(new Author(), new Author())); // Example with 2 empty rows
-        return "author-batch-form";
-    }
-
-    /**
-     * Saves multiple authors from form data.
-     *
-     * @param authors the list of authors
-     * @return redirection to the author list
-     */
-    @PostMapping("/batch-save")
-    public String saveAllAuthors(@ModelAttribute("authorList") List<Author> authors) {
-        for (Author author : authors) {
-            AuthorDetails details = author.getAuthorDetails();
-            if (details != null) {
-                details.setAuthor(author);
-            }
-        }
-        authorService.saveAll(authors);
-        return "redirect:/authors";
-    }
-
-    /**
      * Shows a form to select multiple authors for deletion.
      *
      * @param model the Spring model
      * @return the name of the HTML view
      */
-    @GetMapping("/batch-delete")
+    @GetMapping("/batch-show-all")
     public String showBatchDeleteForm(Model model) {
         List<Author> authors = authorService.findAll();
         model.addAttribute("authors", authors);
-        return "author-batch-delete";
+        return "author-batch-show-delete-all";
     }
 
     /**

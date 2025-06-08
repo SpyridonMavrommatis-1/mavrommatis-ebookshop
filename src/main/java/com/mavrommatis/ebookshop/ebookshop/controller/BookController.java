@@ -1,6 +1,7 @@
 package com.mavrommatis.ebookshop.ebookshop.controller;
 
 import com.mavrommatis.ebookshop.ebookshop.entity.Book;
+import com.mavrommatis.ebookshop.ebookshop.entity.BookDetails;
 import com.mavrommatis.ebookshop.ebookshop.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,7 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Controller class for managing books using Thymeleaf views.
+ * Web controller for managing {@link Book} entities via Thymeleaf views.
+ * Mirrors the structure of the REST controller, adapted for HTML pages.
  */
 @Controller
 @RequestMapping("/books")
@@ -21,7 +23,7 @@ public class BookController {
     /**
      * Constructor-based dependency injection for BookService.
      *
-     * @param bookService the service layer for book operations
+     * @param bookService the service layer for book-related operations
      */
     @Autowired
     public BookController(BookService bookService) {
@@ -29,69 +31,70 @@ public class BookController {
     }
 
     /**
-     * Displays a list of all books.
+     * Retrieves all books and shows them in a list view.
      *
-     * @param model the Spring model to pass data to the view
-     * @return the view name for the book list
+     * @param model the Spring model
+     * @return the name of the HTML view
      */
     @GetMapping
-    public String listBooks(Model model) {
+    public String findAllBooks(Model model) {
         List<Book> books = bookService.findAll();
         model.addAttribute("books", books);
         return "book-list";
     }
 
     /**
-     * Displays the details of a specific book.
+     * Retrieves a book by ID and shows the detail view.
      *
      * @param id the ID of the book
-     * @param model the Spring model to pass data to the view
-     * @return the view name for the book details
+     * @param model the Spring model
+     * @return the name of the HTML view
      */
-    @GetMapping("/{id}")
-    public String showBook(@PathVariable int id, Model model) {
+    @GetMapping("/find/{id}")
+    public String findById(@PathVariable int id, Model model) {
         Book book = bookService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
         model.addAttribute("book", book);
-        return "book-details";
+        return "book-by-id";
     }
 
     /**
-     * Displays the form to create a new book.
+     * Shows the form to create a new book.
      *
-     * @param model the Spring model to pass data to the view
-     * @return the view name for the book form
+     * @param model the Spring model
+     * @return the name of the HTML view
      */
-    @GetMapping("/new")
+    @GetMapping("/find/create-new")
     public String showCreateForm(Model model) {
         model.addAttribute("book", new Book());
         return "book-form";
     }
 
     /**
-     * Handles form submission for creating a new book.
+     * Creates a new book from form data.
      *
-     * @param book the book object populated from the form
-     * @return redirection to the book list page
+     * @param book the book object
+     * @return redirection to the book list
      */
     @PostMapping
-    public String saveBook(@ModelAttribute("book") Book book) {
-        if (book.getBookDetails() != null) {
-            book.getBookDetails().setBook(book);
+    public String createBook(@ModelAttribute("book") Book book) {
+        BookDetails details = book.getBookDetails();
+        if (details != null) {
+            details.setBook(book); // Maintain the bidirectional relationship
         }
         bookService.save(book);
         return "redirect:/books";
     }
 
     /**
-     * Displays the form to edit an existing book.
+     * Shows the form to update an existing book.
      *
      * @param id the ID of the book
-     * @param model the Spring model to pass data to the view
-     * @return the view name for the book form
+     * @param model the Spring model
+     * @return the name of the HTML view
      */
-    @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable int id, Model model) {
+    @GetMapping("/get-edit/{id}")
+    public String showUpdateForm(@PathVariable int id, Model model) {
         Book book = bookService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
         model.addAttribute("book", book);
@@ -99,27 +102,58 @@ public class BookController {
     }
 
     /**
-     * Handles form submission for updating an existing book.
+     * Updates an existing book from form data.
      *
-     * @param id the ID of the book to update
+     * @param id the ID of the book
      * @param book the updated book object
-     * @return redirection to the book list page
+     * @return redirection to the book list
      */
     @PostMapping("/update/{id}")
     public String updateBook(@PathVariable int id, @ModelAttribute("book") Book book) {
         book.setBookId(id);
-        if (book.getBookDetails() != null) {
-            book.getBookDetails().setBook(book);
+        BookDetails details = book.getBookDetails();
+        if (details != null) {
+            details.setBook(book);
         }
         bookService.save(book);
         return "redirect:/books";
     }
 
     /**
-     * Deletes a specific book by ID.
+     * Shows a form to add multiple books.
      *
-     * @param id the ID of the book to delete
-     * @return redirection to the book list page
+     * @param model the Spring model
+     * @return the name of the HTML view
+     */
+    @GetMapping("/batch-create-many")
+    public String showBatchSaveForm(Model model) {
+        model.addAttribute("bookList", List.of(new Book(), new Book())); // Example with 2 empty rows
+        return "book-batch-form";
+    }
+
+    /**
+     * Saves multiple books from form data.
+     *
+     * @param books the list of books
+     * @return redirection to the book list
+     */
+    @PostMapping("/batch-save-all")
+    public String saveAllBooks(@ModelAttribute("bookList") List<Book> books) {
+        for (Book book : books) {
+            BookDetails details = book.getBookDetails();
+            if (details != null) {
+                details.setBook(book);
+            }
+        }
+        bookService.saveAll(books);
+        return "redirect:/books";
+    }
+
+    /**
+     * Deletes a book by ID.
+     *
+     * @param id the ID of the book
+     * @return redirection to the book list
      */
     @GetMapping("/delete/{id}")
     public String deleteBook(@PathVariable int id) {
@@ -128,26 +162,26 @@ public class BookController {
     }
 
     /**
-     * Displays the form to delete multiple books.
+     * Shows a form to select multiple books for deletion.
      *
-     * @param model the Spring model to pass data to the view
-     * @return the view name for batch deletion
+     * @param model the Spring model
+     * @return the name of the HTML view
      */
-    @GetMapping("/batch-delete")
+    @GetMapping("/batch-show-all")
     public String showBatchDeleteForm(Model model) {
         List<Book> books = bookService.findAll();
         model.addAttribute("books", books);
-        return "book-batch-delete";
+        return "book-batch-show-delete-all";
     }
 
     /**
-     * Handles batch deletion of selected books.
+     * Deletes multiple books by their IDs.
      *
-     * @param ids list of book IDs to delete
-     * @return redirection to the book list page
+     * @param ids the list of IDs
+     * @return redirection to the book list
      */
     @PostMapping("/batch-delete")
-    public String deleteSelectedBooks(@RequestParam List<Integer> ids) {
+    public String deleteAllBooks(@RequestParam List<Integer> ids) {
         bookService.deleteAllById(ids);
         return "redirect:/books";
     }
