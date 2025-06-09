@@ -9,10 +9,12 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Represents a Book entity that belongs to an {@link Author} and may contain additional
- * {@link BookDetails}. Supports automatic creation and update timestamps.
+ * Represents a Book entity that belongs to an {@link AuthorEntity} and may contain additional
+ * {@link BookDetailsEntity}. Supports automatic creation and update timestamps.
  */
 @Entity
 @Table(name = "book")
@@ -20,7 +22,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @ToString(exclude = {"author", "bookDetails"})
-public class Book {
+public class BookEntity {
 
     /**
      * Unique identifier for the book (Primary Key).
@@ -67,27 +69,35 @@ public class Book {
     private LocalDateTime updatedAt;
 
     /**
-     * Many-to-One relationship to the {@link Author} entity.
+     * Many-to-One relationship to the {@link AuthorEntity} entity.
      * This book belongs to a single author.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     @JsonBackReference
-    private Author author;
+    private AuthorEntity author;
 
     /**
-     * Represents the one-to-one association with {@link BookDetails}, where this entity is the parent.
+     * Represents the one-to-one association with {@link BookDetailsEntity}, where this entity is the parent.
      * <p>
-     * Cascade operations ensure that any changes to the {@link Book} (such as persist, merge, or delete)
-     * are propagated to the associated {@link BookDetails}. The {@code orphanRemoval=true} flag ensures
-     * that removing the reference to {@link BookDetails} from this {@link Book} will also delete the orphaned
-     * {@link BookDetails} record from the database.
+     * Cascade operations ensure that any changes to the {@link BookEntity} (such as persist, merge, or delete)
+     * are propagated to the associated {@link BookDetailsEntity}. The {@code orphanRemoval=true} flag ensures
+     * that removing the reference to {@link BookDetailsEntity} from this {@link BookEntity} will also delete the orphaned
+     * {@link BookDetailsEntity} record from the database.
      * <p>
-     * This relationship is bidirectional and mapped by the {@code book} field in the {@link BookDetails} entity.
+     * This relationship is bidirectional and mapped by the {@code book} field in the {@link BookDetailsEntity} entity.
      */
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
-    private BookDetails bookDetails;
+    private BookDetailsEntity bookDetails;
+
+    /**
+     * Bidirectional one-to-many relationship with AuthorBook.
+     * Represents the intermediate association between Book and Author.
+     */
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<AuthorBookEntity> authorBooks = new ArrayList<>();
 
     /**
      * Constructs a new Book with the specified fields.
@@ -99,7 +109,7 @@ public class Book {
      * @param literaryForm  the literary form
      * @param author        the author of the book
      */
-    public Book(String title, String language, String genre, String literaryForm, Author author) {
+    public BookEntity(String title, String language, String genre, String literaryForm, AuthorEntity author) {
         this.title = title;
         this.language = language;
         this.genre = genre;
@@ -123,22 +133,19 @@ public class Book {
         updatedAt = LocalDateTime.now();
     }
 
-    /**
-     * Protected setter for creation timestamp.
-     *
-     * @param createdAt the timestamp when the entity is created
-     */
-    protected void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 
     /**
-     * Protected setter for update timestamp.
+     * Adds an AuthorBook association to the book's list.
+     * Ensures bidirectional consistency by setting this book
+     * as the reference in the provided AuthorBook entity.
      *
-     * @param updatedAt the timestamp when the entity is updated
+     * @param authorBook the AuthorBook entity to associate with this book
      */
-    protected void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void addAuthorBook(AuthorBookEntity authorBook) {
+        if (!authorBooks.contains(authorBook)) {
+            authorBooks.add(authorBook);
+            authorBook.setBook(this);
+        }
     }
 
     /**

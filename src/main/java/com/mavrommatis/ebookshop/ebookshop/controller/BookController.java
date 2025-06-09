@@ -1,7 +1,7 @@
 package com.mavrommatis.ebookshop.ebookshop.controller;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.Book;
-import com.mavrommatis.ebookshop.ebookshop.entity.BookDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.BookEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.BookDetailsEntity;
 import com.mavrommatis.ebookshop.ebookshop.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Web controller for managing {@link Book} entities via Thymeleaf views.
+ * Web controller for managing {@link BookEntity} entities via Thymeleaf views.
  * Mirrors the structure of the REST controller, adapted for HTML pages.
  */
 @Controller
@@ -38,7 +38,7 @@ public class BookController {
      */
     @GetMapping
     public String findAllBooks(Model model) {
-        List<Book> books = bookService.findAll();
+        List<BookEntity> books = bookService.findAll();
         model.addAttribute("books", books);
         return "book-list";
     }
@@ -52,7 +52,7 @@ public class BookController {
      */
     @GetMapping("/find/{id}")
     public String findById(@PathVariable int id, Model model) {
-        Book book = bookService.findById(id)
+        BookEntity book = bookService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
         model.addAttribute("book", book);
         return "book-by-id";
@@ -66,7 +66,7 @@ public class BookController {
      */
     @GetMapping("/find/create-new")
     public String showCreateForm(Model model) {
-        model.addAttribute("book", new Book());
+        model.addAttribute("book", new BookEntity());
         return "book-form";
     }
 
@@ -77,8 +77,8 @@ public class BookController {
      * @return redirection to the book list
      */
     @PostMapping
-    public String createBook(@ModelAttribute("book") Book book) {
-        BookDetails details = book.getBookDetails();
+    public String createBook(@ModelAttribute("book") BookEntity book) {
+        BookDetailsEntity details = book.getBookDetails();
         if (details != null) {
             details.setBook(book); // Maintain the bidirectional relationship
         }
@@ -95,7 +95,7 @@ public class BookController {
      */
     @GetMapping("/get-edit/{id}")
     public String showUpdateForm(@PathVariable int id, Model model) {
-        Book book = bookService.findById(id)
+        BookEntity book = bookService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
         model.addAttribute("book", book);
         return "book-form";
@@ -109,9 +109,9 @@ public class BookController {
      * @return redirection to the book list
      */
     @PostMapping("/update/{id}")
-    public String updateBook(@PathVariable int id, @ModelAttribute("book") Book book) {
+    public String updateBook(@PathVariable int id, @ModelAttribute("book") BookEntity book) {
         book.setBookId(id);
-        BookDetails details = book.getBookDetails();
+        BookDetailsEntity details = book.getBookDetails();
         if (details != null) {
             details.setBook(book);
         }
@@ -127,7 +127,7 @@ public class BookController {
      */
     @GetMapping("/batch-create-many")
     public String showBatchSaveForm(Model model) {
-        model.addAttribute("bookList", List.of(new Book(), new Book())); // Example with 2 empty rows
+        model.addAttribute("bookList", List.of(new BookEntity(), new BookEntity())); // Example with 2 empty rows
         return "book-batch-form";
     }
 
@@ -138,9 +138,9 @@ public class BookController {
      * @return redirection to the book list
      */
     @PostMapping("/batch-save-all")
-    public String saveAllBooks(@ModelAttribute("bookList") List<Book> books) {
-        for (Book book : books) {
-            BookDetails details = book.getBookDetails();
+    public String saveAllBooks(@ModelAttribute("bookList") List<BookEntity> books) {
+        for (BookEntity book : books) {
+            BookDetailsEntity details = book.getBookDetails();
             if (details != null) {
                 details.setBook(book);
             }
@@ -169,7 +169,7 @@ public class BookController {
      */
     @GetMapping("/batch-show-all")
     public String showBatchDeleteForm(Model model) {
-        List<Book> books = bookService.findAll();
+        List<BookEntity> books = bookService.findAll();
         model.addAttribute("books", books);
         return "book-batch-show-delete-all";
     }

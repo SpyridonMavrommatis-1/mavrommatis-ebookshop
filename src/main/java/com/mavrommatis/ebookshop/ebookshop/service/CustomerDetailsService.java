@@ -1,12 +1,12 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetailsEntity;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Service interface for managing {@link CustomerDetails} entities.
+ * Service interface for managing {@link CustomerDetailsEntity} entities.
  * Provides methods for retrieving, saving, and deleting customer detail records.
  */
 public interface CustomerDetailsService {
@@ -14,9 +14,9 @@ public interface CustomerDetailsService {
     /**
      * Retrieve all customer details from the database.
      *
-     * @return a list of all {@link CustomerDetails}
+     * @return a list of all {@link CustomerDetailsEntity}
      */
-    List<CustomerDetails> findAll();
+    List<CustomerDetailsEntity> findAll();
 
     /**
      * Find customer details by their ID.
@@ -24,23 +24,23 @@ public interface CustomerDetailsService {
      * @param id the ID of the customer details record
      * @return an {@link Optional} containing the customer details if found, or empty otherwise
      */
-    Optional<CustomerDetails> findById(Integer id);
+    Optional<CustomerDetailsEntity> findById(Integer id);
 
     /**
      * Save a new customer details entry to the database.
      *
      * @param customerDetails the customer details entity to save
-     * @return the saved {@link CustomerDetails}
+     * @return the saved {@link CustomerDetailsEntity}
      */
-    CustomerDetails save(CustomerDetails customerDetails);
+    CustomerDetailsEntity save(CustomerDetailsEntity customerDetails);
 
     /**
      * Save a list of customer details entries to the database.
      *
      * @param customerDetails a list of customer details entities to save
-     * @return the saved list of {@link CustomerDetails}
+     * @return the saved list of {@link CustomerDetailsEntity}
      */
-    List<CustomerDetails> saveAll(List<CustomerDetails> customerDetails);
+    List<CustomerDetailsEntity> saveAll(List<CustomerDetailsEntity> customerDetails);
 
     /**
      * Delete a customer details record by its ID if it exists.

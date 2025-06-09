@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @ToString(exclude = {"customerDetails"})
-public class Customer {
+public class CustomerEntity {
 
     /**
      * Primary key for Customer entity.
@@ -66,7 +66,7 @@ public class Customer {
      */
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private CustomerDetails customerDetails;
+    private CustomerDetailsEntity customerDetails;
 
     /**
      * Constructs a Customer with basic login information.
@@ -75,7 +75,7 @@ public class Customer {
      * @param password the customer's password
      * @param username the customer's username
      */
-    public Customer(String email, String password, String username) {
+    public CustomerEntity(String email, String password, String username) {
         this.email = email;
         this.password = password;
         this.username = username;

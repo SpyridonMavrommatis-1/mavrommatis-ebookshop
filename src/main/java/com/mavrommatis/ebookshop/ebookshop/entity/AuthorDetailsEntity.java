@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Represents additional details for an {@link Author}, such as biography, birth date, and website.
+ * Represents additional details for an {@link AuthorEntity}, such as biography, birth date, and website.
  * This entity has a one-to-one relationship with the Author entity.
  */
 @Entity
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @ToString(exclude = "author")
-public class AuthorDetails {
+public class AuthorDetailsEntity {
 
     /**
      * The ID of the author. Shared primary key with the Author entity.
@@ -68,7 +68,7 @@ public class AuthorDetails {
     @MapsId
     @JoinColumn(name = "author_id")
     @JsonBackReference
-    private Author author;
+    private AuthorEntity author;
 
     /**
      * Constructs an AuthorDetails object with the given values.
@@ -77,7 +77,7 @@ public class AuthorDetails {
      * @param birthDate the date of birth
      * @param website   the website URL
      */
-    public AuthorDetails(String biography, LocalDate birthDate, String website) {
+    public AuthorDetailsEntity(String biography, LocalDate birthDate, String website) {
         this.biography = biography;
         this.birthDate = birthDate;
         this.website = website;

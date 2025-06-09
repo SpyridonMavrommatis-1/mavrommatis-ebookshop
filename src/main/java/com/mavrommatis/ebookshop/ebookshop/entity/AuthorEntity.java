@@ -21,7 +21,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @ToString(exclude = {"authorDetails"})
-public class Author {
+public class AuthorEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,7 +45,7 @@ public class Author {
      */
     @OneToOne(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private AuthorDetails authorDetails;
+    private AuthorDetailsEntity authorDetails;
 
     /**
      * One-to-many relation with Book.
@@ -53,7 +53,16 @@ public class Author {
      */
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<Book> books = new ArrayList<>();
+    private List<BookEntity> books = new ArrayList<>();
+
+    /**
+     * Bidirectional one-to-many relationship with AuthorBook.
+     * Represents the intermediate association between Author and Book.
+     */
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<AuthorBookEntity> authorBooks = new ArrayList<>();
+
 
     /**
      * Constructor used to create an Author with first and last name.
@@ -61,7 +70,7 @@ public class Author {
      * @param firstName the author's first name
      * @param lastName  the author's last name
      */
-    public Author(String firstName, String lastName) {
+    public AuthorEntity(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
     }
@@ -87,10 +96,24 @@ public class Author {
      *
      * @param book the book to be added
      */
-    public void addBook(Book book) {
+    public void addBook(BookEntity book) {
         if (!books.contains(book)) {
             books.add(book);
             book.setAuthor(this);
         }
     }
+    /**
+     * Adds an AuthorBook association to the author's list.
+     * Ensures bidirectional consistency by setting this author
+     * as the reference in the provided AuthorBook entity.
+     *
+     * @param authorBook the AuthorBook entity to associate with this author
+     */
+    public void addAuthorBook(AuthorBookEntity authorBook) {
+        if (!authorBooks.contains(authorBook)) {
+            authorBooks.add(authorBook);
+            authorBook.setAuthor(this);
+        }
+    }
+
 }

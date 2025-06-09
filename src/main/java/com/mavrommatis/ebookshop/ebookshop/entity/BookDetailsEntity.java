@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @ToString(exclude = "book")
-public class BookDetails {
+public class BookDetailsEntity {
 
 
     /**
@@ -97,7 +97,7 @@ public class BookDetails {
     @MapsId
     @JoinColumn(name = "book_id")
     @JsonBackReference
-    private Book book;
+    private BookEntity book;
 
 
     /**
@@ -112,8 +112,8 @@ public class BookDetails {
      * @param publishDate  publication date
      * @param isbn         ISBN number
      */
-    public BookDetails(BigDecimal weight, String coverType, String dimensions,
-                       String summary, int pages, LocalDate publishDate, String isbn) {
+    public BookDetailsEntity(BigDecimal weight, String coverType, String dimensions,
+                             String summary, int pages, LocalDate publishDate, String isbn) {
         this.weight = weight;
         this.coverType = coverType;
         this.dimensions = dimensions;
@@ -139,19 +139,6 @@ public class BookDetails {
         updatedAt = LocalDateTime.now();
     }
 
-    /**
-     * Protected setter for createdAt to prevent manual override.
-     */
-    protected void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    /**
-     * Protected setter for updatedAt to prevent manual override.
-     */
-    protected void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 
 
     /**

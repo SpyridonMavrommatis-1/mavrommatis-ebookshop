@@ -1,9 +1,9 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
 import com.mavrommatis.ebookshop.ebookshop.dao.BookRepository;
-import com.mavrommatis.ebookshop.ebookshop.entity.Author;
-import com.mavrommatis.ebookshop.ebookshop.entity.Book;
-import com.mavrommatis.ebookshop.ebookshop.entity.BookDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.AuthorEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.BookEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.BookDetailsEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,10 +37,10 @@ public class BookServiceImpl implements BookService {
     /**
      * Retrieve all books from the database.
      *
-     * @return a list of all {@link Book} entities
+     * @return a list of all {@link BookEntity} entities
      */
     @Override
-    public List<Book> findAll() {
+    public List<BookEntity> findAll() {
         return bookRepository.findAll();
     }
 
@@ -51,7 +51,7 @@ public class BookServiceImpl implements BookService {
      * @return an {@link Optional} containing the book if found, or empty otherwise
      */
     @Override
-    public Optional<Book> findById(Integer id) {
+    public Optional<BookEntity> findById(Integer id) {
         return bookRepository.findById(id);
     }
 
@@ -59,11 +59,11 @@ public class BookServiceImpl implements BookService {
      * Save a new book if it doesn't already exist in the database.
      *
      * @param book the book entity to save
-     * @return the saved {@link Book}
+     * @return the saved {@link BookEntity}
      * @throws RuntimeException if the book already exists
      */
     @Override
-    public Book save(Book book) {
+    public BookEntity save(BookEntity book) {
         if (book.getBookId() != 0 && bookRepository.existsById(book.getBookId())) {
             throw new RuntimeException("Book already exists with id: " + book.getBookId());
         }
@@ -79,8 +79,8 @@ public class BookServiceImpl implements BookService {
      */
     @Override
     @Transactional
-    public List<Book> saveAll(List<Book> books) {
-        for (Book book : books) {
+    public List<BookEntity> saveAll(List<BookEntity> books) {
+        for (BookEntity book : books) {
             if (book.getBookId() != 0 && bookRepository.existsById(book.getBookId())) {
                 throw new RuntimeException("Book already exists with id: " + book.getBookId());
             }
@@ -89,18 +89,18 @@ public class BookServiceImpl implements BookService {
     }
 
     /**
-     * Updates an existing {@link Book} in the database, ensuring safe merging of nested entities.
+     * Updates an existing {@link BookEntity} in the database, ensuring safe merging of nested entities.
      * <p>
      * This method retrieves the managed instance of the book from the database, then updates its fields
-     * and relationships (such as {@link BookDetails} and {@link Author}) carefully, avoiding conflicts
+     * and relationships (such as {@link BookDetailsEntity} and {@link AuthorEntity}) carefully, avoiding conflicts
      * caused by multiple objects with the same identifier in the persistence context.
      *
-     * @param book the {@link Book} entity containing updated values (from client input)
-     * @return the updated and saved {@link Book} entity
+     * @param book the {@link BookEntity} entity containing updated values (from client input)
+     * @return the updated and saved {@link BookEntity} entity
      * @throws RuntimeException if the book or the associated author does not exist
      */
     @Override
-    public Book update(Book book) {
+    public BookEntity update(BookEntity book) {
         int bookId = book.getBookId();
 
         if (bookId == 0 || !bookRepository.existsById(bookId)) {
@@ -108,7 +108,7 @@ public class BookServiceImpl implements BookService {
         }
 
         // Fetch the managed Book entity from the database
-        Book existingBook = bookRepository.findById(bookId)
+        BookEntity existingBook = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
 
         // Update primitive fields of Book
@@ -118,9 +118,9 @@ public class BookServiceImpl implements BookService {
         existingBook.setLiteraryForm(book.getLiteraryForm());
 
         // Handle BookDetails relationship carefully to avoid NonUniqueObjectException
-        BookDetails newDetails = book.getBookDetails();
+        BookDetailsEntity newDetails = book.getBookDetails();
         if (newDetails != null) {
-            BookDetails managedDetails = existingBook.getBookDetails();
+            BookDetailsEntity managedDetails = existingBook.getBookDetails();
             if (managedDetails == null) {
                 newDetails.setBook(existingBook);
                 existingBook.setBookDetails(newDetails);
@@ -137,7 +137,7 @@ public class BookServiceImpl implements BookService {
 
         // Handle Author relationship
         if (book.getAuthor() != null && book.getAuthor().getAuthorId() != 0) {
-            Author managedAuthor = authorService.findById(book.getAuthor().getAuthorId())
+            AuthorEntity managedAuthor = authorService.findById(book.getAuthor().getAuthorId())
                     .orElseThrow(() -> new RuntimeException("Author not found with id: " + book.getAuthor().getAuthorId()));
             existingBook.setAuthor(managedAuthor);
             managedAuthor.addBook(existingBook); // maintain bidirectional consistency
@@ -155,7 +155,7 @@ public class BookServiceImpl implements BookService {
      */
     @Override
     public void deleteById(Integer id) {
-        Optional<Book> book = bookRepository.findById(id);
+        Optional<BookEntity> book = bookRepository.findById(id);
 
         if (book.isPresent()) {
             bookRepository.deleteById(id);

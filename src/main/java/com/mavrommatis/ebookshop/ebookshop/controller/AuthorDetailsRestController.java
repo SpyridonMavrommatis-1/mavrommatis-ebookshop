@@ -1,6 +1,6 @@
 package com.mavrommatis.ebookshop.ebookshop.controller;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.AuthorDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.AuthorDetailsEntity;
 import com.mavrommatis.ebookshop.ebookshop.service.AuthorDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * REST controller for managing {@link AuthorDetails} entities.
+ * REST controller for managing {@link AuthorDetailsEntity} entities.
  * Provides JSON-based endpoints for CRUD operations.
  */
 @RestController
@@ -33,7 +33,7 @@ public class AuthorDetailsRestController {
      * @return a list of AuthorDetails
      */
     @GetMapping
-    public List<AuthorDetails> findAll() {
+    public List<AuthorDetailsEntity> findAll() {
         return authorDetailsService.findAll();
     }
 
@@ -45,7 +45,7 @@ public class AuthorDetailsRestController {
      * @throws RuntimeException if not found
      */
     @GetMapping("/{id}")
-    public AuthorDetails findById(@PathVariable int id) {
+    public AuthorDetailsEntity findById(@PathVariable int id) {
         return authorDetailsService.findById(id)
                 .orElseThrow(() -> new RuntimeException("AuthorDetails not found with id: " + id));
     }
@@ -57,7 +57,7 @@ public class AuthorDetailsRestController {
      * @return the created AuthorDetails
      */
     @PostMapping
-    public AuthorDetails createAuthorDetails(@RequestBody AuthorDetails authorDetails) {
+    public AuthorDetailsEntity createAuthorDetails(@RequestBody AuthorDetailsEntity authorDetails) {
         return authorDetailsService.save(authorDetails);
     }
 
@@ -69,7 +69,7 @@ public class AuthorDetailsRestController {
      * @return the updated AuthorDetails
      */
     @PutMapping("/{id}")
-    public AuthorDetails updateAuthorDetails(@PathVariable int id, @RequestBody AuthorDetails authorDetails) {
+    public AuthorDetailsEntity updateAuthorDetails(@PathVariable int id, @RequestBody AuthorDetailsEntity authorDetails) {
         authorDetails.setAuthorId(id);
         return authorDetailsService.save(authorDetails);
     }
@@ -81,7 +81,7 @@ public class AuthorDetailsRestController {
      * @return the list of saved AuthorDetails
      */
     @PostMapping("/batch")
-    public List<AuthorDetails> saveAllAuthorDetails(@RequestBody List<AuthorDetails> authorDetailsList) {
+    public List<AuthorDetailsEntity> saveAllAuthorDetails(@RequestBody List<AuthorDetailsEntity> authorDetailsList) {
         return authorDetailsService.saveAll(authorDetailsList);
     }
 

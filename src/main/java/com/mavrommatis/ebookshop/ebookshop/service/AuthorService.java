@@ -1,12 +1,12 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.Author;
+import com.mavrommatis.ebookshop.ebookshop.entity.AuthorEntity;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Service interface for managing {@link Author} entities.
+ * Service interface for managing {@link AuthorEntity} entities.
  * Defines the contract for operations related to authors.
  */
 public interface AuthorService {
@@ -16,7 +16,7 @@ public interface AuthorService {
      *
      * @return a list of all authors.
      */
-    List<Author> findAll();
+    List<AuthorEntity> findAll();
 
     /**
      * Retrieve a specific author by ID.
@@ -24,7 +24,7 @@ public interface AuthorService {
      * @param id the ID of the author to find.
      * @return an Optional containing the author if found, or empty otherwise.
      */
-    Optional<Author> findById(Integer id);
+    Optional<AuthorEntity> findById(Integer id);
 
     /**
      * Save a new author to the database.
@@ -32,7 +32,7 @@ public interface AuthorService {
      * @param author the author to be saved.
      * @return the saved author entity.
      */
-    Author save(Author author);
+    AuthorEntity save(AuthorEntity author);
 
     /**
      * Save multiple authors to the database.
@@ -40,7 +40,7 @@ public interface AuthorService {
      * @param authors list of authors to be saved.
      * @return list of saved author entities.
      */
-    List<Author> saveAll(List<Author> authors);
+    List<AuthorEntity> saveAll(List<AuthorEntity> authors);
 
     /**
      * Delete an author by its ID.

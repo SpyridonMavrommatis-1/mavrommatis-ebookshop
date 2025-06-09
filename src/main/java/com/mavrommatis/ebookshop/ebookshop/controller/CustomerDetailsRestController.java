@@ -1,6 +1,6 @@
 package com.mavrommatis.ebookshop.ebookshop.controller;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetailsEntity;
 import com.mavrommatis.ebookshop.ebookshop.service.CustomerDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +33,7 @@ public class CustomerDetailsRestController {
      * @return a list of all CustomerDetails
      */
     @GetMapping
-    public List<CustomerDetails> findAll() {
+    public List<CustomerDetailsEntity> findAll() {
         return customerDetailsService.findAll();
     }
 
@@ -45,7 +45,7 @@ public class CustomerDetailsRestController {
      * @throws RuntimeException if not found
      */
     @GetMapping("/{id}")
-    public CustomerDetails findById(@PathVariable int id) {
+    public CustomerDetailsEntity findById(@PathVariable int id) {
         return customerDetailsService.findById(id)
                 .orElseThrow(() -> new RuntimeException("CustomerDetails not found with id: " + id));
     }
@@ -57,7 +57,7 @@ public class CustomerDetailsRestController {
      * @return the created CustomerDetails
      */
     @PostMapping
-    public CustomerDetails createCustomerDetails(@RequestBody CustomerDetails customerDetails) {
+    public CustomerDetailsEntity createCustomerDetails(@RequestBody CustomerDetailsEntity customerDetails) {
         return customerDetailsService.save(customerDetails);
     }
 
@@ -69,7 +69,7 @@ public class CustomerDetailsRestController {
      * @return the updated CustomerDetails
      */
     @PutMapping("/{id}")
-    public CustomerDetails updateCustomerDetails(@PathVariable int id, @RequestBody CustomerDetails customerDetails) {
+    public CustomerDetailsEntity updateCustomerDetails(@PathVariable int id, @RequestBody CustomerDetailsEntity customerDetails) {
         customerDetails.setCustomerId(id);
         return customerDetailsService.save(customerDetails);
     }
@@ -81,7 +81,7 @@ public class CustomerDetailsRestController {
      * @return the saved list of CustomerDetails
      */
     @PostMapping("/batch")
-    public List<CustomerDetails> saveAllCustomerDetails(@RequestBody List<CustomerDetails> customerDetailsList) {
+    public List<CustomerDetailsEntity> saveAllCustomerDetails(@RequestBody List<CustomerDetailsEntity> customerDetailsList) {
         return customerDetailsService.saveAll(customerDetailsList);
     }
 

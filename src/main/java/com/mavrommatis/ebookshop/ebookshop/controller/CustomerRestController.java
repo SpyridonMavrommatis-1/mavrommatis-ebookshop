@@ -1,7 +1,7 @@
 package com.mavrommatis.ebookshop.ebookshop.controller;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.Customer;
-import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.CustomerEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetailsEntity;
 import com.mavrommatis.ebookshop.ebookshop.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +34,7 @@ public class CustomerRestController {
      * @return a list of all Customer objects
      */
     @GetMapping
-    public List<Customer> findAll() {
+    public List<CustomerEntity> findAll() {
         return customerService.findAll();
     }
 
@@ -46,7 +46,7 @@ public class CustomerRestController {
      * @throws RuntimeException if the customer does not exist
      */
     @GetMapping("/{id}")
-    public Customer findById(@PathVariable int id) {
+    public CustomerEntity findById(@PathVariable int id) {
         return customerService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
     }
@@ -58,8 +58,8 @@ public class CustomerRestController {
      * @return the saved Customer
      */
     @PostMapping
-    public Customer createCustomer(@RequestBody Customer customer) {
-        CustomerDetails details = customer.getCustomerDetails();
+    public CustomerEntity createCustomer(@RequestBody CustomerEntity customer) {
+        CustomerDetailsEntity details = customer.getCustomerDetails();
         if (details != null) {
             details.setCustomer(customer);  // Maintain bidirectional relationship
         }
@@ -74,9 +74,9 @@ public class CustomerRestController {
      * @return the updated Customer
      */
     @PutMapping("/{id}")
-    public Customer updateCustomer(@PathVariable int id, @RequestBody Customer customer) {
+    public CustomerEntity updateCustomer(@PathVariable int id, @RequestBody CustomerEntity customer) {
         customer.setCustomerId(id);
-        CustomerDetails details = customer.getCustomerDetails();
+        CustomerDetailsEntity details = customer.getCustomerDetails();
         if (details != null) {
             details.setCustomer(customer);  // Maintain relationship
         }
@@ -102,9 +102,9 @@ public class CustomerRestController {
      * @return the list of saved customers
      */
     @PostMapping("/batch")
-    public List<Customer> saveAllCustomers(@RequestBody List<Customer> customers) {
-        for (Customer customer : customers) {
-            CustomerDetails details = customer.getCustomerDetails();
+    public List<CustomerEntity> saveAllCustomers(@RequestBody List<CustomerEntity> customers) {
+        for (CustomerEntity customer : customers) {
+            CustomerDetailsEntity details = customer.getCustomerDetails();
             if (details != null) {
                 details.setCustomer(customer);
             }

@@ -1,6 +1,6 @@
 package com.mavrommatis.ebookshop.ebookshop.controller;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetailsEntity;
 import com.mavrommatis.ebookshop.ebookshop.service.CustomerDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * MVC Controller for managing {@link CustomerDetails} using HTML views.
+ * MVC Controller for managing {@link CustomerDetailsEntity} using HTML views.
  * Handles CRUD and batch operations with Thymeleaf integration.
  */
 @Controller
@@ -37,7 +37,7 @@ public class CustomerDetailsController {
      */
     @GetMapping
     public String findAll(Model model) {
-        List<CustomerDetails> customerDetailsList = customerDetailsService.findAll();
+        List<CustomerDetailsEntity> customerDetailsList = customerDetailsService.findAll();
         model.addAttribute("customerDetailsList", customerDetailsList);
         return "customer-details-list";
     }
@@ -51,7 +51,7 @@ public class CustomerDetailsController {
      */
     @GetMapping("/find/{id}")
     public String findById(@PathVariable int id, Model model) {
-        CustomerDetails details = customerDetailsService.findById(id)
+        CustomerDetailsEntity details = customerDetailsService.findById(id)
                 .orElseThrow(() -> new RuntimeException("CustomerDetails not found with id: " + id));
         model.addAttribute("customerDetails", details);
         return "customer-details-by-id";
@@ -65,7 +65,7 @@ public class CustomerDetailsController {
      */
     @GetMapping("/find/create-new")
     public String showCreateForm(Model model) {
-        model.addAttribute("customerDetails", new CustomerDetails());
+        model.addAttribute("customerDetails", new CustomerDetailsEntity());
         return "customer-details-form";
     }
 
@@ -76,7 +76,7 @@ public class CustomerDetailsController {
      * @return redirection to the list of CustomerDetails
      */
     @PostMapping
-    public String create(@ModelAttribute("customerDetails") CustomerDetails customerDetails) {
+    public String create(@ModelAttribute("customerDetails") CustomerDetailsEntity customerDetails) {
         customerDetailsService.save(customerDetails);
         return "redirect:/customer-details";
     }
@@ -90,7 +90,7 @@ public class CustomerDetailsController {
      */
     @GetMapping("/get-edit/{id}")
     public String showEditForm(@PathVariable int id, Model model) {
-        CustomerDetails details = customerDetailsService.findById(id)
+        CustomerDetailsEntity details = customerDetailsService.findById(id)
                 .orElseThrow(() -> new RuntimeException("CustomerDetails not found with id: " + id));
         model.addAttribute("customerDetails", details);
         return "customer-details-form";
@@ -104,7 +104,7 @@ public class CustomerDetailsController {
      * @return redirection to the list view
      */
     @PostMapping("/update/{id}")
-    public String update(@PathVariable int id, @ModelAttribute("customerDetails") CustomerDetails customerDetails) {
+    public String update(@PathVariable int id, @ModelAttribute("customerDetails") CustomerDetailsEntity customerDetails) {
         customerDetails.setCustomerId(id);
         customerDetailsService.save(customerDetails);
         return "redirect:/customer-details";
@@ -118,7 +118,7 @@ public class CustomerDetailsController {
      */
     @GetMapping("/batch-save")
     public String showBatchForm(Model model) {
-        model.addAttribute("customerDetailsList", List.of(new CustomerDetails(), new CustomerDetails()));
+        model.addAttribute("customerDetailsList", List.of(new CustomerDetailsEntity(), new CustomerDetailsEntity()));
         return "customer-details-batch-form";
     }
 
@@ -129,7 +129,7 @@ public class CustomerDetailsController {
      * @return redirection to the list view
      */
     @PostMapping("/batch-save-all")
-    public String saveAll(@ModelAttribute("customerDetailsList") List<CustomerDetails> customerDetailsList) {
+    public String saveAll(@ModelAttribute("customerDetailsList") List<CustomerDetailsEntity> customerDetailsList) {
         customerDetailsService.saveAll(customerDetailsList);
         return "redirect:/customer-details";
     }
@@ -154,7 +154,7 @@ public class CustomerDetailsController {
      */
     @GetMapping("/batch-show-all")
     public String showBatchDeleteForm(Model model) {
-        List<CustomerDetails> customerDetailsList = customerDetailsService.findAll();
+        List<CustomerDetailsEntity> customerDetailsList = customerDetailsService.findAll();
         model.addAttribute("customerDetailsList", customerDetailsList);
         return "customer-details-batch-select";
     }

@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @ToString(exclude = "customer")
-public class CustomerDetails {
+public class CustomerDetailsEntity {
 
     /**
      * Primary key and foreign key. Shared with the Customer entity.
@@ -75,7 +75,7 @@ public class CustomerDetails {
     @MapsId
     @JoinColumn(name = "customer_id")
     @JsonBackReference
-    private Customer customer;
+    private CustomerEntity customer;
 
     /**
      * Constructs a CustomerDetails object with basic personal data.
@@ -85,7 +85,7 @@ public class CustomerDetails {
      * @param address   the address
      * @param phone     the phone number
      */
-    public CustomerDetails(String firstName, String lastName, String address, String phone) {
+    public CustomerDetailsEntity(String firstName, String lastName, String address, String phone) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;

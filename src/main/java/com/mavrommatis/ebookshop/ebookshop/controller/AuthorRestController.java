@@ -1,7 +1,7 @@
 package com.mavrommatis.ebookshop.ebookshop.controller;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.Author;
-import com.mavrommatis.ebookshop.ebookshop.entity.AuthorDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.AuthorEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.AuthorDetailsEntity;
 import com.mavrommatis.ebookshop.ebookshop.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * REST controller for managing {@link Author} entities.
+ * REST controller for managing {@link AuthorEntity} entities.
  * Exposes endpoints for CRUD and batch operations over JSON.
  */
 @RestController
@@ -34,7 +34,7 @@ public class AuthorRestController {
      * @return a list of all authors
      */
     @GetMapping
-    public List<Author> findAll() {
+    public List<AuthorEntity> findAll() {
         return authorService.findAll();
     }
 
@@ -46,7 +46,7 @@ public class AuthorRestController {
      * @throws RuntimeException if the author is not found
      */
     @GetMapping("/find/{id}")
-    public Author findById(@PathVariable int id) {
+    public AuthorEntity findById(@PathVariable int id) {
         return authorService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Author not found with id: " + id));
     }
@@ -58,8 +58,8 @@ public class AuthorRestController {
      * @return the saved author
      */
     @PostMapping
-    public Author createAuthor(@RequestBody Author author) {
-        AuthorDetails details = author.getAuthorDetails();
+    public AuthorEntity createAuthor(@RequestBody AuthorEntity author) {
+        AuthorDetailsEntity details = author.getAuthorDetails();
         if (details != null) {
             details.setAuthor(author); // Maintain the bidirectional relationship
         }
@@ -74,9 +74,9 @@ public class AuthorRestController {
      * @return the updated author
      */
     @PutMapping("/update/{id}")
-    public Author updateAuthor(@PathVariable int id, @RequestBody Author author) {
+    public AuthorEntity updateAuthor(@PathVariable int id, @RequestBody AuthorEntity author) {
         author.setAuthorId(id);
-        AuthorDetails details = author.getAuthorDetails();
+        AuthorDetailsEntity details = author.getAuthorDetails();
         if (details != null) {
             details.setAuthor(author);
         }
@@ -102,9 +102,9 @@ public class AuthorRestController {
      * @return the list of saved authors
      */
     @PostMapping("/batch-save")
-    public List<Author> saveAllAuthors(@RequestBody List<Author> authors) {
-        for (Author author : authors) {
-            AuthorDetails details = author.getAuthorDetails();
+    public List<AuthorEntity> saveAllAuthors(@RequestBody List<AuthorEntity> authors) {
+        for (AuthorEntity author : authors) {
+            AuthorDetailsEntity details = author.getAuthorDetails();
             if (details != null) {
                 details.setAuthor(author);
             }

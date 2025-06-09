@@ -1,12 +1,12 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.Customer;
+import com.mavrommatis.ebookshop.ebookshop.entity.CustomerEntity;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Service interface for managing {@link Customer} entities.
+ * Service interface for managing {@link CustomerEntity} entities.
  * Provides standard CRUD operations for customer management.
  */
 public interface CustomerService {
@@ -14,9 +14,9 @@ public interface CustomerService {
     /**
      * Retrieve all customers from the database.
      *
-     * @return a list of {@link Customer} entities
+     * @return a list of {@link CustomerEntity} entities
      */
-    List<Customer> findAll();
+    List<CustomerEntity> findAll();
 
     /**
      * Find a customer by their unique ID.
@@ -24,23 +24,23 @@ public interface CustomerService {
      * @param id the customer ID
      * @return an {@link Optional} containing the customer if found, or empty if not
      */
-    Optional<Customer> findById(Integer id);
+    Optional<CustomerEntity> findById(Integer id);
 
     /**
      * Save a new customer if they do not already exist.
      *
      * @param customer the customer to be saved
-     * @return the saved {@link Customer} entity
+     * @return the saved {@link CustomerEntity} entity
      */
-    Customer save(Customer customer);
+    CustomerEntity save(CustomerEntity customer);
 
     /**
      * Save a list of customers. If any of them already exist, an exception should be thrown in implementation.
      *
      * @param customers the list of customers to save
-     * @return the list of saved {@link Customer} entities
+     * @return the list of saved {@link CustomerEntity} entities
      */
-    List<Customer> saveAll(List<Customer> customers);
+    List<CustomerEntity> saveAll(List<CustomerEntity> customers);
 
     /**
      * Delete a customer by their ID.

@@ -1,14 +1,14 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
 import com.mavrommatis.ebookshop.ebookshop.dao.CustomerDetailsRepository;
-import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetailsEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Service implementation class for managing {@link CustomerDetails}.
+ * Service implementation class for managing {@link CustomerDetailsEntity}.
  * Provides CRUD operations using {@link CustomerDetailsRepository}.
  */
 @Service
@@ -28,10 +28,10 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
     /**
      * Retrieve all customer details records from the database.
      *
-     * @return a list of {@link CustomerDetails}
+     * @return a list of {@link CustomerDetailsEntity}
      */
     @Override
-    public List<CustomerDetails> findAll() {
+    public List<CustomerDetailsEntity> findAll() {
         return customerDetailsRepository.findAll();
     }
 
@@ -42,7 +42,7 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
      * @return an {@link Optional} containing the customer details if found, or empty if not
      */
     @Override
-    public Optional<CustomerDetails> findById(Integer id) {
+    public Optional<CustomerDetailsEntity> findById(Integer id) {
         return customerDetailsRepository.findById(id);
     }
 
@@ -50,11 +50,11 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
      * Save a new customer details record if it doesn't already exist.
      *
      * @param customerDetails the customer details to save
-     * @return the saved {@link CustomerDetails}
+     * @return the saved {@link CustomerDetailsEntity}
      * @throws RuntimeException if a record with the same ID already exists
      */
     @Override
-    public CustomerDetails save(CustomerDetails customerDetails) {
+    public CustomerDetailsEntity save(CustomerDetailsEntity customerDetails) {
         if (customerDetails.getCustomerId() != 0 &&
                 customerDetailsRepository.existsById(customerDetails.getCustomerId())) {
             throw new RuntimeException("CustomerDetails already exists with id: " + customerDetails.getCustomerId());
@@ -66,12 +66,12 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
      * Save a list of customer details, ensuring none already exist by ID.
      *
      * @param customersDetails the list of customer details to save
-     * @return the saved list of {@link CustomerDetails}
+     * @return the saved list of {@link CustomerDetailsEntity}
      * @throws RuntimeException if any of the records already exist
      */
     @Override
-    public List<CustomerDetails> saveAll(List<CustomerDetails> customersDetails) {
-        for (CustomerDetails customerDetails : customersDetails) {
+    public List<CustomerDetailsEntity> saveAll(List<CustomerDetailsEntity> customersDetails) {
+        for (CustomerDetailsEntity customerDetails : customersDetails) {
             if (customerDetails.getCustomerId() != 0 &&
                     customerDetailsRepository.existsById(customerDetails.getCustomerId())) {
                 throw new RuntimeException("CustomerDetails already exists with id: " + customerDetails.getCustomerId());
@@ -88,7 +88,7 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
      */
     @Override
     public void deleteById(Integer id) {
-        Optional<CustomerDetails> customerDetails = customerDetailsRepository.findById(id);
+        Optional<CustomerDetailsEntity> customerDetails = customerDetailsRepository.findById(id);
         if (customerDetails.isPresent()) {
             customerDetailsRepository.deleteById(id);
         } else {

@@ -1,8 +1,8 @@
 package com.mavrommatis.ebookshop.ebookshop.controller;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.Author;
-import com.mavrommatis.ebookshop.ebookshop.entity.Book;
-import com.mavrommatis.ebookshop.ebookshop.entity.BookDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.AuthorEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.BookEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.BookDetailsEntity;
 import com.mavrommatis.ebookshop.ebookshop.service.AuthorService;
 import com.mavrommatis.ebookshop.ebookshop.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * REST controller that handles HTTP requests for managing {@link Book} entities.
- * Supports full CRUD operations and ensures bidirectional relationships with {@link Author} and {@link BookDetails}.
+ * REST controller that handles HTTP requests for managing {@link BookEntity} entities.
+ * Supports full CRUD operations and ensures bidirectional relationships with {@link AuthorEntity} and {@link BookDetailsEntity}.
  */
 @RestController
 @RequestMapping("/api/books")
@@ -36,10 +36,10 @@ public class BookRestController {
     /**
      * Retrieves a list of all books from the database.
      *
-     * @return a list of all {@link Book} entities
+     * @return a list of all {@link BookEntity} entities
      */
     @GetMapping
-    public List<Book> findAll() {
+    public List<BookEntity> findAll() {
         return bookService.findAll();
     }
 
@@ -47,11 +47,11 @@ public class BookRestController {
      * Retrieves a single book by its unique ID.
      *
      * @param id the ID of the book to retrieve
-     * @return the {@link Book} entity, if found
+     * @return the {@link BookEntity} entity, if found
      * @throws RuntimeException if the book is not found
      */
     @GetMapping("/{id}")
-    public Book findById(@PathVariable int id) {
+    public BookEntity findById(@PathVariable int id) {
         return bookService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
     }
@@ -59,19 +59,19 @@ public class BookRestController {
     /**
      * Creates a new book, assigning it to an existing author and linking any book details.
      *
-     * @param book the {@link Book} entity sent in the request body
-     * @return the newly saved {@link Book}
+     * @param book the {@link BookEntity} entity sent in the request body
+     * @return the newly saved {@link BookEntity}
      * @throws RuntimeException if the author is not found or the ID is missing
      */
     @PostMapping
-    public Book createBook(@RequestBody Book book) {
-        BookDetails details = book.getBookDetails();
+    public BookEntity createBook(@RequestBody BookEntity book) {
+        BookDetailsEntity details = book.getBookDetails();
         if (details != null) {
             details.setBook(book); // maintain bidirectional link
         }
 
         if (book.getAuthor() != null && book.getAuthor().getAuthorId() != 0) {
-            Author managedAuthor = authorService.findById(book.getAuthor().getAuthorId())
+            AuthorEntity managedAuthor = authorService.findById(book.getAuthor().getAuthorId())
                     .orElseThrow(() -> new RuntimeException("Author not found with id: " + book.getAuthor().getAuthorId()));
             book.setAuthor(managedAuthor);
             managedAuthor.addBook(book); // maintain bidirectional link
@@ -83,19 +83,19 @@ public class BookRestController {
     }
 
     /**
-     * Updates an existing {@link Book} entity based on the provided ID and request body.
+     * Updates an existing {@link BookEntity} entity based on the provided ID and request body.
      * <p>
      * This method delegates the update logic to the {@link com.mavrommatis.ebookshop.ebookshop.service.BookService},
-     * which ensures that all necessary relationships (e.g., {@link com.mavrommatis.ebookshop.ebookshop.entity.Author},
-     * {@link com.mavrommatis.ebookshop.ebookshop.entity.BookDetails}) are handled appropriately.
+     * which ensures that all necessary relationships (e.g., {@link AuthorEntity},
+     * {@link BookDetailsEntity}) are handled appropriately.
      *
      * @param id   the ID of the book to be updated
-     * @param book the updated {@link Book} object received in the request body
-     * @return the updated {@link Book} entity after persistence
+     * @param book the updated {@link BookEntity} object received in the request body
+     * @return the updated {@link BookEntity} entity after persistence
      * @throws RuntimeException if the book or author does not exist
      */
     @PutMapping("/{id}")
-    public Book updateBook(@PathVariable int id, @RequestBody Book book) {
+    public BookEntity updateBook(@PathVariable int id, @RequestBody BookEntity book) {
         book.setBookId(id);
         return bookService.update(book);
     }
@@ -115,20 +115,20 @@ public class BookRestController {
     /**
      * Saves multiple books in batch, validating authors and book details.
      *
-     * @param books the list of {@link Book} entities to save
-     * @return the list of saved {@link Book} entities
+     * @param books the list of {@link BookEntity} entities to save
+     * @return the list of saved {@link BookEntity} entities
      * @throws RuntimeException if any book has missing or invalid author ID
      */
     @PostMapping("/batch-save-all")
-    public List<Book> saveAllBooks(@RequestBody List<Book> books) {
-        for (Book book : books) {
-            BookDetails details = book.getBookDetails();
+    public List<BookEntity> saveAllBooks(@RequestBody List<BookEntity> books) {
+        for (BookEntity book : books) {
+            BookDetailsEntity details = book.getBookDetails();
             if (details != null) {
                 details.setBook(book);
             }
 
             if (book.getAuthor() != null && book.getAuthor().getAuthorId() != 0) {
-                Author managedAuthor = authorService.findById(book.getAuthor().getAuthorId())
+                AuthorEntity managedAuthor = authorService.findById(book.getAuthor().getAuthorId())
                         .orElseThrow(() -> new RuntimeException("Author not found with id: " + book.getAuthor().getAuthorId()));
                 book.setAuthor(managedAuthor);
                 managedAuthor.addBook(book);

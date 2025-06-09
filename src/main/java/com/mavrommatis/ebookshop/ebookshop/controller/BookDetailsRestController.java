@@ -1,6 +1,6 @@
 package com.mavrommatis.ebookshop.ebookshop.controller;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.BookDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.BookDetailsEntity;
 import com.mavrommatis.ebookshop.ebookshop.service.BookDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * REST controller for managing {@link BookDetails} entities.
+ * REST controller for managing {@link BookDetailsEntity} entities.
  * Provides endpoints for CRUD and batch operations, returning JSON responses.
  */
 @RestController
@@ -33,7 +33,7 @@ public class BookDetailsRestController {
      * @return a list of BookDetails
      */
     @GetMapping
-    public List<BookDetails> findAll() {
+    public List<BookDetailsEntity> findAll() {
         return bookDetailsService.findAll();
     }
 
@@ -45,7 +45,7 @@ public class BookDetailsRestController {
      * @throws RuntimeException if the entry is not found
      */
     @GetMapping("/{id}")
-    public BookDetails findById(@PathVariable int id) {
+    public BookDetailsEntity findById(@PathVariable int id) {
         return bookDetailsService.findById(id)
                 .orElseThrow(() -> new RuntimeException("BookDetails not found with id: " + id));
     }
@@ -57,7 +57,7 @@ public class BookDetailsRestController {
      * @return the saved BookDetails
      */
     @PostMapping
-    public BookDetails createBookDetails(@RequestBody BookDetails bookDetails) {
+    public BookDetailsEntity createBookDetails(@RequestBody BookDetailsEntity bookDetails) {
         return bookDetailsService.save(bookDetails);
     }
 
@@ -69,7 +69,7 @@ public class BookDetailsRestController {
      * @return the saved BookDetails
      */
     @PutMapping("/{id}")
-    public BookDetails updateBookDetails(@PathVariable int id, @RequestBody BookDetails bookDetails) {
+    public BookDetailsEntity updateBookDetails(@PathVariable int id, @RequestBody BookDetailsEntity bookDetails) {
         bookDetails.setBookId(id);
         return bookDetailsService.save(bookDetails);
     }
@@ -81,7 +81,7 @@ public class BookDetailsRestController {
      * @return the list of saved BookDetails
      */
     @PostMapping("/batch-save-all")
-    public List<BookDetails> saveAllBookDetails(@RequestBody List<BookDetails> bookDetailsList) {
+    public List<BookDetailsEntity> saveAllBookDetails(@RequestBody List<BookDetailsEntity> bookDetailsList) {
         return bookDetailsService.saveAll(bookDetailsList);
     }
 

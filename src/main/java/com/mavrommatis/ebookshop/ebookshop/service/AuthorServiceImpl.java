@@ -1,14 +1,14 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
 import com.mavrommatis.ebookshop.ebookshop.dao.AuthorRepository;
-import com.mavrommatis.ebookshop.ebookshop.entity.Author;
+import com.mavrommatis.ebookshop.ebookshop.entity.AuthorEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Service implementation for managing {@link Author} entities.
+ * Service implementation for managing {@link AuthorEntity} entities.
  * Delegates database operations to {@link AuthorRepository}.
  */
 @Service
@@ -29,7 +29,7 @@ public class AuthorServiceImpl implements AuthorService {
      * {@inheritDoc}
      */
     @Override
-    public List<Author> findAll() {
+    public List<AuthorEntity> findAll() {
         return authorRepository.findAll();
     }
 
@@ -37,7 +37,7 @@ public class AuthorServiceImpl implements AuthorService {
      * {@inheritDoc}
      */
     @Override
-    public Optional<Author> findById(Integer id) {
+    public Optional<AuthorEntity> findById(Integer id) {
         return authorRepository.findById(id);
     }
 
@@ -45,7 +45,7 @@ public class AuthorServiceImpl implements AuthorService {
      * {@inheritDoc}
      */
     @Override
-    public Author save(Author author) {
+    public AuthorEntity save(AuthorEntity author) {
         if (author.getAuthorId() != 0 && authorRepository.existsById(author.getAuthorId())) {
             throw new RuntimeException("Author already exists with id: " + author.getAuthorId());
         }
@@ -56,8 +56,8 @@ public class AuthorServiceImpl implements AuthorService {
      * {@inheritDoc}
      */
     @Override
-    public List<Author> saveAll(List<Author> authors) {
-        for (Author author : authors) {
+    public List<AuthorEntity> saveAll(List<AuthorEntity> authors) {
+        for (AuthorEntity author : authors) {
             if (author.getAuthorId() != 0 && authorRepository.existsById(author.getAuthorId())) {
                 throw new RuntimeException("Author already exists with id: " + author.getAuthorId());
             }
@@ -70,7 +70,7 @@ public class AuthorServiceImpl implements AuthorService {
      */
     @Override
     public void deleteById(Integer id) {
-        Optional<Author> author = authorRepository.findById(id);
+        Optional<AuthorEntity> author = authorRepository.findById(id);
         if (author.isPresent()) {
             authorRepository.deleteById(id);
         } else {

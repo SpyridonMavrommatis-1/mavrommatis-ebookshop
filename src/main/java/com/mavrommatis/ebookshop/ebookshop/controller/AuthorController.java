@@ -1,7 +1,7 @@
 package com.mavrommatis.ebookshop.ebookshop.controller;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.Author;
-import com.mavrommatis.ebookshop.ebookshop.entity.AuthorDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.AuthorEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.AuthorDetailsEntity;
 import com.mavrommatis.ebookshop.ebookshop.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Web controller for managing {@link Author} entities via Thymeleaf views.
+ * Web controller for managing {@link AuthorEntity} entities via Thymeleaf views.
  * Mirrors the structure of the REST controller, adapted for HTML pages.
  */
 @Controller
@@ -38,7 +38,7 @@ public class AuthorController {
      */
     @GetMapping
     public String findAll(Model model) {
-        List<Author> authors = authorService.findAll();
+        List<AuthorEntity> authors = authorService.findAll();
         model.addAttribute("authors", authors);
         return "author-list";
     }
@@ -52,7 +52,7 @@ public class AuthorController {
      */
     @GetMapping("/find/{id}")
     public String findById(@PathVariable int id, Model model) {
-        Author author = authorService.findById(id)
+        AuthorEntity author = authorService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Author not found with id: " + id));
         model.addAttribute("author", author);
         return "author-by-id";
@@ -66,7 +66,7 @@ public class AuthorController {
      */
     @GetMapping("/find/create-new")
     public String showCreateForm(Model model) {
-        model.addAttribute("author", new Author());
+        model.addAttribute("author", new AuthorEntity());
         return "author-form";
     }
 
@@ -77,8 +77,8 @@ public class AuthorController {
      * @return redirection to the author list
      */
     @PostMapping
-    public String createAuthor(@ModelAttribute("author") Author author) {
-        AuthorDetails details = author.getAuthorDetails();
+    public String createAuthor(@ModelAttribute("author") AuthorEntity author) {
+        AuthorDetailsEntity details = author.getAuthorDetails();
         if (details != null) {
             details.setAuthor(author); // Maintain the bidirectional relationship
         }
@@ -95,7 +95,7 @@ public class AuthorController {
      */
     @GetMapping("/get-edit/{id}")
     public String showUpdateForm(@PathVariable int id, Model model) {
-        Author author = authorService.findById(id)
+        AuthorEntity author = authorService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Author not found with id: " + id));
         model.addAttribute("author", author);
         return "author-form";
@@ -109,9 +109,9 @@ public class AuthorController {
      * @return redirection to the author list
      */
     @PostMapping("/update/{id}")
-    public String updateAuthor(@PathVariable int id, @ModelAttribute("author") Author author) {
+    public String updateAuthor(@PathVariable int id, @ModelAttribute("author") AuthorEntity author) {
         author.setAuthorId(id);
-        AuthorDetails details = author.getAuthorDetails();
+        AuthorDetailsEntity details = author.getAuthorDetails();
         if (details != null) {
             details.setAuthor(author);
         }
@@ -128,7 +128,7 @@ public class AuthorController {
      */
     @GetMapping("/batch-create-many")
     public String showBatchSaveForm(Model model) {
-        model.addAttribute("authorList", List.of(new Author(), new Author())); // Example with 2 empty rows
+        model.addAttribute("authorList", List.of(new AuthorEntity(), new AuthorEntity())); // Example with 2 empty rows
         return "author-batch-form";
     }
 
@@ -139,9 +139,9 @@ public class AuthorController {
      * @return redirection to the author list
      */
     @PostMapping("/batch-save-all")
-    public String saveAllAuthors(@ModelAttribute("authorList") List<Author> authors) {
-        for (Author author : authors) {
-            AuthorDetails details = author.getAuthorDetails();
+    public String saveAllAuthors(@ModelAttribute("authorList") List<AuthorEntity> authors) {
+        for (AuthorEntity author : authors) {
+            AuthorDetailsEntity details = author.getAuthorDetails();
             if (details != null) {
                 details.setAuthor(author);
             }
@@ -170,7 +170,7 @@ public class AuthorController {
      */
     @GetMapping("/batch-show-all")
     public String showBatchDeleteForm(Model model) {
-        List<Author> authors = authorService.findAll();
+        List<AuthorEntity> authors = authorService.findAll();
         model.addAttribute("authors", authors);
         return "author-batch-show-delete-all";
     }

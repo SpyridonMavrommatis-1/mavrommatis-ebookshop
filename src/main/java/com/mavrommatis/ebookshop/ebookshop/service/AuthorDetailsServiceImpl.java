@@ -1,7 +1,7 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
 import com.mavrommatis.ebookshop.ebookshop.dao.AuthorDetailsRepository;
-import com.mavrommatis.ebookshop.ebookshop.entity.AuthorDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.AuthorDetailsEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.Optional;
 
 /**
  * Service implementation for {@link AuthorDetailsService}.
- * Handles business logic related to the {@link AuthorDetails} entity.
+ * Handles business logic related to the {@link AuthorDetailsEntity} entity.
  */
 @Service
 public class AuthorDetailsServiceImpl implements AuthorDetailsService {
@@ -31,7 +31,7 @@ public class AuthorDetailsServiceImpl implements AuthorDetailsService {
      * @return list of AuthorDetails.
      */
     @Override
-    public List<AuthorDetails> findAll() {
+    public List<AuthorDetailsEntity> findAll() {
         return authorDetailsRepository.findAll();
     }
 
@@ -42,7 +42,7 @@ public class AuthorDetailsServiceImpl implements AuthorDetailsService {
      * @return an Optional of AuthorDetails.
      */
     @Override
-    public Optional<AuthorDetails> findById(Integer id) {
+    public Optional<AuthorDetailsEntity> findById(Integer id) {
         return authorDetailsRepository.findById(id);
     }
 
@@ -54,7 +54,7 @@ public class AuthorDetailsServiceImpl implements AuthorDetailsService {
      * @return the saved entity.
      */
     @Override
-    public AuthorDetails save(AuthorDetails authorDetails) {
+    public AuthorDetailsEntity save(AuthorDetailsEntity authorDetails) {
         if (authorDetails.getAuthorId() != 0 && authorDetailsRepository.existsById(authorDetails.getAuthorId())) {
             throw new RuntimeException("AuthorDetails already exists with id: " + authorDetails.getAuthorId());
         }
@@ -69,8 +69,8 @@ public class AuthorDetailsServiceImpl implements AuthorDetailsService {
      * @return list of saved AuthorDetails.
      */
     @Override
-    public List<AuthorDetails> saveAll(List<AuthorDetails> authorsDetails) {
-        for (AuthorDetails authorDetails : authorsDetails) {
+    public List<AuthorDetailsEntity> saveAll(List<AuthorDetailsEntity> authorsDetails) {
+        for (AuthorDetailsEntity authorDetails : authorsDetails) {
             if (authorDetails.getAuthorId() != 0 && authorDetailsRepository.existsById(authorDetails.getAuthorId())) {
                 throw new RuntimeException("AuthorDetails already exists with id: " + authorDetails.getAuthorId());
             }
@@ -86,7 +86,7 @@ public class AuthorDetailsServiceImpl implements AuthorDetailsService {
      */
     @Override
     public void deleteById(Integer id) {
-        Optional<AuthorDetails> authorDetails = authorDetailsRepository.findById(id);
+        Optional<AuthorDetailsEntity> authorDetails = authorDetailsRepository.findById(id);
 
         if (authorDetails.isPresent()) {
             authorDetailsRepository.deleteById(id);

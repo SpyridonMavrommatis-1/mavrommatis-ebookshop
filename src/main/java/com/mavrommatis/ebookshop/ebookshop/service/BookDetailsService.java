@@ -1,12 +1,12 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.BookDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.BookDetailsEntity;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Service interface for managing {@link BookDetails} entities.
+ * Service interface for managing {@link BookDetailsEntity} entities.
  * Defines CRUD operations for working with detailed book information.
  */
 public interface BookDetailsService {
@@ -14,44 +14,44 @@ public interface BookDetailsService {
     /**
      * Retrieve all book details records from the database.
      *
-     * @return a list of all {@link BookDetails}
+     * @return a list of all {@link BookDetailsEntity}
      */
-    List<BookDetails> findAll();
+    List<BookDetailsEntity> findAll();
 
     /**
-     * Retrieve a specific {@link BookDetails} record by its ID.
+     * Retrieve a specific {@link BookDetailsEntity} record by its ID.
      *
      * @param id the ID of the book details
      * @return an {@link Optional} containing the found entity or empty if not found
      */
-    Optional<BookDetails> findById(Integer id);
+    Optional<BookDetailsEntity> findById(Integer id);
 
     /**
-     * Save a new {@link BookDetails} record to the database.
+     * Save a new {@link BookDetailsEntity} record to the database.
      * If the record already exists, it will be updated.
      *
      * @param bookDetails the book details to save
-     * @return the saved {@link BookDetails} entity
+     * @return the saved {@link BookDetailsEntity} entity
      */
-    BookDetails save(BookDetails bookDetails);
+    BookDetailsEntity save(BookDetailsEntity bookDetails);
 
     /**
-     * Save multiple {@link BookDetails} records at once.
+     * Save multiple {@link BookDetailsEntity} records at once.
      *
      * @param bookDetails a list of book details to save
-     * @return a list of saved {@link BookDetails} entities
+     * @return a list of saved {@link BookDetailsEntity} entities
      */
-    List<BookDetails> saveAll(List<BookDetails> bookDetails);
+    List<BookDetailsEntity> saveAll(List<BookDetailsEntity> bookDetails);
 
     /**
-     * Delete a specific {@link BookDetails} record by its ID if it exists.
+     * Delete a specific {@link BookDetailsEntity} record by its ID if it exists.
      *
      * @param id the ID of the book details to delete
      */
     void deleteById(Integer id);
 
     /**
-     * Delete multiple {@link BookDetails} records by their IDs if they exist.
+     * Delete multiple {@link BookDetailsEntity} records by their IDs if they exist.
      *
      * @param ids a list of IDs representing book details to delete
      */

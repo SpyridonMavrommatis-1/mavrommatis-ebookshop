@@ -1,14 +1,14 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
 import com.mavrommatis.ebookshop.ebookshop.dao.BookDetailsRepository;
-import com.mavrommatis.ebookshop.ebookshop.entity.BookDetails;
+import com.mavrommatis.ebookshop.ebookshop.entity.BookDetailsEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Service implementation for managing {@link BookDetails} entities.
+ * Service implementation for managing {@link BookDetailsEntity} entities.
  * Delegates database operations to {@link BookDetailsRepository}.
  */
 @Service
@@ -29,7 +29,7 @@ public class BookDetailsServiceImpl implements BookDetailsService {
      * {@inheritDoc}
      */
     @Override
-    public List<BookDetails> findAll() {
+    public List<BookDetailsEntity> findAll() {
         return bookDetailsRepository.findAll();
     }
 
@@ -37,7 +37,7 @@ public class BookDetailsServiceImpl implements BookDetailsService {
      * {@inheritDoc}
      */
     @Override
-    public Optional<BookDetails> findById(Integer id) {
+    public Optional<BookDetailsEntity> findById(Integer id) {
         return bookDetailsRepository.findById(id);
     }
 
@@ -45,7 +45,7 @@ public class BookDetailsServiceImpl implements BookDetailsService {
      * {@inheritDoc}
      */
     @Override
-    public BookDetails save(BookDetails bookDetails) {
+    public BookDetailsEntity save(BookDetailsEntity bookDetails) {
         if (bookDetails.getBookId() != 0 && bookDetailsRepository.existsById(bookDetails.getBookId())) {
             throw new RuntimeException("BookDetails already exists with id: " + bookDetails.getBookId());
         }
@@ -56,8 +56,8 @@ public class BookDetailsServiceImpl implements BookDetailsService {
      * {@inheritDoc}
      */
     @Override
-    public List<BookDetails> saveAll(List<BookDetails> booksDetails) {
-        for (BookDetails bookDetails : booksDetails) {
+    public List<BookDetailsEntity> saveAll(List<BookDetailsEntity> booksDetails) {
+        for (BookDetailsEntity bookDetails : booksDetails) {
             if (bookDetails.getBookId() != 0 && bookDetailsRepository.existsById(bookDetails.getBookId())) {
                 throw new RuntimeException("BookDetails already exists with id: " + bookDetails.getBookId());
             }
@@ -70,7 +70,7 @@ public class BookDetailsServiceImpl implements BookDetailsService {
      */
     @Override
     public void deleteById(Integer id) {
-        Optional<BookDetails> bookDetails = bookDetailsRepository.findById(id);
+        Optional<BookDetailsEntity> bookDetails = bookDetailsRepository.findById(id);
 
         if (bookDetails.isPresent()) {
             bookDetailsRepository.deleteById(id);
