@@ -2,9 +2,7 @@ package com.mavrommatis.ebookshop.ebookshop.mapper;
 
 import com.mavrommatis.ebookshop.ebookshop.dto.AuthorBookDTO;
 import com.mavrommatis.ebookshop.ebookshop.dto.BookDTO;
-import com.mavrommatis.ebookshop.ebookshop.dto.BookDetailsDTO;
 import com.mavrommatis.ebookshop.ebookshop.entity.AuthorBookEntity;
-import com.mavrommatis.ebookshop.ebookshop.entity.BookDetailsEntity;
 import com.mavrommatis.ebookshop.ebookshop.entity.BookEntity;
 
 import java.util.List;
@@ -33,7 +31,7 @@ public class BookMapper {
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .authorId(entity.getAuthor() != null ? entity.getAuthor().getAuthorId() : null)
-                .bookDetails(toBookDetailsDTO(entity.getBookDetails()))
+                .bookDetails(BookDetailsMapper.toBookDetailsDTO(entity.getBookDetails()))
                 .authorBooks(toAuthorBookDTOList(entity.getAuthorBooks()))
                 .build();
     }
@@ -55,7 +53,7 @@ public class BookMapper {
         entity.setLiteraryForm(dto.getLiteraryForm());
         entity.setCreatedAt(dto.getCreatedAt());
         entity.setUpdatedAt(dto.getUpdatedAt());
-        entity.setBookDetails(toBookDetailsEntity(dto.getBookDetails()));
+        entity.setBookDetails(BookDetailsMapper.toBookDetailsEntity(dto.getBookDetails()));
 
         if (dto.getAuthorBooks() != null) {
             List<AuthorBookEntity> authorBookEntities = toAuthorBookEntityList(dto.getAuthorBooks());
@@ -68,55 +66,10 @@ public class BookMapper {
     }
 
     /**
-     * Converts a BookDetailsEntity to a BookDetailsDTO.
+     * Converts a list of AuthorBookEntity to a list of AuthorBookDTO.
      *
-     * @param entity the BookDetailsEntity to convert
-     * @return the corresponding BookDetailsDTO
-     */
-    private static BookDetailsDTO toBookDetailsDTO(BookDetailsEntity entity) {
-        if (entity == null) return null;
-
-        return BookDetailsDTO.builder()
-                .bookId(entity.getBookId())
-                .isbn(entity.getIsbn())
-                .publishDate(entity.getPublishDate())
-                .pages(entity.getPages())
-                .summary(entity.getSummary())
-                .dimensions(entity.getDimensions())
-                .coverType(entity.getCoverType())
-                .weight(entity.getWeight())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .build();
-    }
-
-    /**
-     * Converts a BookDetailsDTO to a BookDetailsEntity.
-     *
-     * @param dto the BookDetailsDTO to convert
-     * @return the corresponding BookDetailsEntity
-     */
-    private static BookDetailsEntity toBookDetailsEntity(BookDetailsDTO dto) {
-        if (dto == null) return null;
-
-        BookDetailsEntity entity = new BookDetailsEntity();
-        entity.setBookId(dto.getBookId());
-        entity.setIsbn(dto.getIsbn());
-        entity.setPublishDate(dto.getPublishDate());
-        entity.setPages(dto.getPages());
-        entity.setSummary(dto.getSummary());
-        entity.setDimensions(dto.getDimensions());
-        entity.setCoverType(dto.getCoverType());
-        entity.setWeight(dto.getWeight());
-        entity.setCreatedAt(dto.getCreatedAt());
-        entity.setUpdatedAt(dto.getUpdatedAt());
-        return entity;
-    }
-    /**
-     * Converts a list of {@link AuthorBookEntity} to a list of {@link AuthorBookDTO}.
-     *
-     * @param entities the list of AuthorBookEntity to convert
-     * @return list of AuthorBookDTOs, or null if input is null
+     * @param entities the list of AuthorBookEntity
+     * @return the corresponding list of AuthorBookDTO
      */
     private static List<AuthorBookDTO> toAuthorBookDTOList(List<AuthorBookEntity> entities) {
         if (entities == null) return null;
@@ -132,10 +85,10 @@ public class BookMapper {
     }
 
     /**
-     * Converts a list of {@link AuthorBookDTO} to a list of {@link AuthorBookEntity}.
+     * Converts a list of AuthorBookDTO to a list of AuthorBookEntity.
      *
-     * @param dtos the list of AuthorBookDTOs to convert
-     * @return list of AuthorBookEntities, or null if input is null
+     * @param dtos the list of AuthorBookDTO
+     * @return the corresponding list of AuthorBookEntity
      */
     private static List<AuthorBookEntity> toAuthorBookEntityList(List<AuthorBookDTO> dtos) {
         if (dtos == null) return null;
@@ -145,7 +98,7 @@ public class BookMapper {
                     AuthorBookEntity entity = new AuthorBookEntity();
                     entity.setCreatedAt(dto.getCreatedAt());
                     entity.setUpdatedAt(dto.getUpdatedAt());
-                    // Note: Author and Book references must be set externally from services/repositories
+                    // Author and Book references must be set in the service layer.
                     return entity;
                 })
                 .collect(Collectors.toList());

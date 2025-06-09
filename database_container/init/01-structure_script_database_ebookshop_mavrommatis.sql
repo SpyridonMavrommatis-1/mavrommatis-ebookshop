@@ -15,22 +15,25 @@ CREATE TABLE book (
   language VARCHAR(100) NOT NULL,
   genre VARCHAR(100) NOT NULL,            -- Genre of the book (e.g., fantasy, drama, thriller).
   literary_form VARCHAR(100) NOT NULL,    -- Literary form (e.g., novel, poetry, essay), required field.
+  isbn VARCHAR(20) NOT NULL,                       -- ISBN of the book, moved from book_details.
+  is_collective BOOLEAN NOT NULL DEFAULT FALSE,  -- Indicates if the book is a collective work.
   author_id INT NOT NULL,                 -- Foreign key for One-to-Many: each book has one main author.
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,   -- Timestamp when the record was created.
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- Timestamp for the last update.
   PRIMARY KEY (book_id),
-  CONSTRAINT fk_book_author	
-    FOREIGN KEY (author_id) REFERENCES author(author_id)   -- Creates One-to-Many relation
-      ON DELETE RESTRICT                   -- Prevents deletion of author if books exist.
-      ON UPDATE CASCADE                    -- Keeps relationship intact if author_id changes.
+  CONSTRAINT fk_book_author
+    FOREIGN KEY (author_id) REFERENCES author(author_id)
+      ON DELETE RESTRICT
+      ON UPDATE CASCADE,
+  CONSTRAINT uq_book_unique_entry
+    UNIQUE (isbn, author_id, is_collective)  -- Conditional uniqueness emulation
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;  -- utf8mb4 preferred for full Unicode support
+
 
 -- Create the 'book_details' table to store additional details for each book.
 CREATE TABLE book_details (
-  book_id INT NOT NULL,	-- Foreign key referencing book(book_id).
-  isbn VARCHAR(20), -- ISBN of the book, must not be unique, because of double entries in collective works.
-  -- Note: In the development section we must solve the issue of giving same isbn on non-collective works!!!
-  publish_date DATE, 
+  book_id INT NOT NULL,  -- Foreign key referencing book(book_id).
+  publish_date DATE,
   pages INT,
   summary TEXT,
   dimensions VARCHAR(50), -- The dimensions of a book are given as e.g. "20x15x3 cm" (length x width x height).
@@ -39,21 +42,24 @@ CREATE TABLE book_details (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (book_id),
-  CONSTRAINT fk_book_details_book	-- Primary key; also a foreign key.
+  CONSTRAINT fk_book_details_book  -- Primary key; also a foreign key.
     FOREIGN KEY (book_id) REFERENCES book(book_id)
-    ON DELETE CASCADE	-- If a book is deleted, its details are also deleted.
-    ON UPDATE CASCADE	-- If a book is updated, its details are also updated.
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 -- Create the 'author' table to store basic information about each author.
 CREATE TABLE author (
   author_id INT NOT NULL AUTO_INCREMENT, 
   first_name VARCHAR(100) NOT NULL,
   last_name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (author_id)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4; -- Preferable charset because of its wide range Unicode support.
+  PRIMARY KEY (author_id),
+  CONSTRAINT uq_author_email UNIQUE (email)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 -- Create the 'author_details' table to store additional information about each author.
 CREATE TABLE author_details (
@@ -96,11 +102,12 @@ CREATE TABLE book_reviews (
   book_id INT NOT NULL,                           -- Foreign key: reviewed book.
   customer_id INT NOT NULL,                       -- Foreign key: customer who wrote the review.
   rating INT NOT NULL,                            -- Numeric rating given by the customer (REQUIRED).
-  -- Note: These review fields must be filled neccesarily by the customer!!!
+  -- Note: These review fields must be filled necessarily by the customer!!!
   comment TEXT,                                   -- Review comment (OPTIONAL: change to NOT NULL if you want it mandatory).
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,  -- Date/time review was posted.
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (review_id),
+  CONSTRAINT uq_review_per_book_per_customer UNIQUE (book_id, customer_id), -- A customer can review a specific book only once.
   CONSTRAINT fk_review_book
     FOREIGN KEY (book_id) REFERENCES book(book_id)
     ON DELETE CASCADE
