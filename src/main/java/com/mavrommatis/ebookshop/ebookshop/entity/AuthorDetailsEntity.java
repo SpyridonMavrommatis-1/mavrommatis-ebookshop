@@ -11,8 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Represents additional details for an {@link AuthorEntity}, such as biography, birth date, and website.
- * This entity has a one-to-one relationship with the Author entity.
+ * Represents additional details for an Author entity.
+ * This class is mapped in a one-to-one relationship with AuthorEntity.
  */
 @Entity
 @Table(name = "author_details")
@@ -23,10 +23,9 @@ import java.time.LocalDateTime;
 public class AuthorDetailsEntity {
 
     /**
-     * The ID of the author. Shared primary key with the Author entity.
+     * The ID of the author, shared with AuthorEntity.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "author_id")
     private int authorId;
 
@@ -37,32 +36,31 @@ public class AuthorDetailsEntity {
     private String biography;
 
     /**
-     * The birth date of the author.
+     * The author's date of birth.
      */
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
     /**
-     * The website URL of the author.
+     * The author's website.
      */
     @Column(name = "website")
     private String website;
 
     /**
-     * Timestamp indicating when the entity was created.
+     * Timestamp of when the record was created.
      */
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     /**
-     * Timestamp indicating when the entity was last updated.
+     * Timestamp of the last update.
      */
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     /**
-     * Reference to the associated Author entity.
-     * This is a bidirectional one-to-one relationship.
+     * The associated AuthorEntity (parent).
      */
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
@@ -71,11 +69,7 @@ public class AuthorDetailsEntity {
     private AuthorEntity author;
 
     /**
-     * Constructs an AuthorDetails object with the given values.
-     *
-     * @param biography the biography text
-     * @param birthDate the date of birth
-     * @param website   the website URL
+     * Constructor with fields.
      */
     public AuthorDetailsEntity(String biography, LocalDate birthDate, String website) {
         this.biography = biography;
@@ -84,7 +78,7 @@ public class AuthorDetailsEntity {
     }
 
     /**
-     * Sets the creation timestamp before persisting the entity.
+     * Sets createdAt before persisting.
      */
     @PrePersist
     protected void onCreate() {
@@ -92,28 +86,10 @@ public class AuthorDetailsEntity {
     }
 
     /**
-     * Sets the update timestamp before updating the entity.
+     * Sets updatedAt before update.
      */
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-
-    /**
-     * Protected setter for createdAt to avoid unintended modification.
-     *
-     * @param createdAt the creation timestamp
-     */
-    protected void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    /**
-     * Protected setter for updatedAt to avoid unintended modification.
-     *
-     * @param updatedAt the update timestamp
-     */
-    protected void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

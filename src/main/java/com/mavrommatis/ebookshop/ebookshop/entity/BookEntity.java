@@ -13,8 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a Book entity that belongs to an {@link AuthorEntity} and may contain additional
- * {@link BookDetailsEntity}. Supports automatic creation and update timestamps.
+ * Represents a Book entity stored in the database.
+ * Each book has a unique identifier and is associated with one main author.
+ * Additional information is handled via related entities such as BookDetailsEntity and AuthorBookEntity.
  */
 @Entity
 @Table(name = "book")
@@ -33,113 +34,121 @@ public class BookEntity {
     private int bookId;
 
     /**
-     * Title of the book.
+     * Title of the book (cannot be null).
      */
-    @Column(name = "title")
+    @Column(name = "title", nullable = false, length = 255)
     private String title;
 
     /**
-     * Language in which the book is written.
+     * Language in which the book is written (cannot be null).
      */
-    @Column(name = "language")
+    @Column(name = "language", nullable = false, length = 100)
     private String language;
 
     /**
-     * Genre or category of the book.
+     * Genre or category of the book (e.g., fantasy, thriller) (cannot be null).
      */
-    @Column(name = "genre")
+    @Column(name = "genre", nullable = false, length = 100)
     private String genre;
 
     /**
-     * Indicates the literary form (e.g., Novel, Poem).
+     * Literary form of the book (e.g., novel, poem, essay) (cannot be null).
      */
-    @Column(name = "literary_form")
+    @Column(name = "literary_form", nullable = false, length = 100)
     private String literaryForm;
 
     /**
-     * Timestamp for when the book was created.
+     * ISBN code of the book (unique per author/collective combination).
      */
-    @Column(name = "created_at")
+    @Column(name = "isbn", nullable = false, length = 20)
+    private String isbn;
+
+    /**
+     * Indicates whether the book is a collective work or not.
+     */
+    @Column(name = "is_collective", nullable = false)
+    private boolean isCollective = false;
+
+    /**
+     * Timestamp when the book was created (automatically set on persist).
+     */
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     /**
-     * Timestamp for when the book was last updated.
+     * Timestamp when the book was last updated (automatically updated on change).
      */
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     /**
-     * Many-to-One relationship to the {@link AuthorEntity} entity.
-     * This book belongs to a single author.
+     * Many-to-One relationship to the main author of the book.
+     * Every book must be associated with a single author.
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id")
+    @JoinColumn(name = "author_id", nullable = false)
     @JsonBackReference
     private AuthorEntity author;
 
     /**
-     * Represents the one-to-one association with {@link BookDetailsEntity}, where this entity is the parent.
-     * <p>
-     * Cascade operations ensure that any changes to the {@link BookEntity} (such as persist, merge, or delete)
-     * are propagated to the associated {@link BookDetailsEntity}. The {@code orphanRemoval=true} flag ensures
-     * that removing the reference to {@link BookDetailsEntity} from this {@link BookEntity} will also delete the orphaned
-     * {@link BookDetailsEntity} record from the database.
-     * <p>
-     * This relationship is bidirectional and mapped by the {@code book} field in the {@link BookDetailsEntity} entity.
+     * One-to-One relationship with the book's detailed metadata.
+     * Cascades operations and removes orphaned details automatically.
      */
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
     private BookDetailsEntity bookDetails;
 
     /**
-     * Bidirectional one-to-many relationship with AuthorBook.
-     * Represents the intermediate association between Book and Author.
+     * One-to-Many relationship with intermediate AuthorBook entities (for many-to-many logic).
      */
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<AuthorBookEntity> authorBooks = new ArrayList<>();
 
     /**
-     * Constructs a new Book with the specified fields.
-     * Automatically adds this book to the provided author's book list.
+     * Constructs a new BookEntity and assigns it to the specified author.
      *
-     * @param title         the title of the book
-     * @param language      the language of the book
-     * @param genre         the genre of the book
-     * @param literaryForm  the literary form
-     * @param author        the author of the book
+     * @param title         the book's title
+     * @param language      the language in which the book is written
+     * @param genre         the genre/category of the book
+     * @param literaryForm  the literary form (e.g., novel, poem)
+     * @param isbn          the ISBN of the book
+     * @param isCollective  flag indicating whether this is a collective work
+     * @param author        the author entity associated with the book
      */
-    public BookEntity(String title, String language, String genre, String literaryForm, AuthorEntity author) {
+    public BookEntity(String title, String language, String genre, String literaryForm, String isbn, boolean isCollective, AuthorEntity author) {
         this.title = title;
         this.language = language;
         this.genre = genre;
         this.literaryForm = literaryForm;
-        author.addBook(this);
+        this.isbn = isbn;
+        this.isCollective = isCollective;
+        this.author = author;
+        author.addBook(this);  // maintains bidirectional link
     }
 
     /**
-     * Sets the creation timestamp before persisting.
+     * Lifecycle callback to set the creation and update timestamps when the book is first persisted.
      */
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
     }
 
     /**
-     * Sets the update timestamp before updating.
+     * Lifecycle callback to update the timestamp when the book is modified.
      */
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
-
     /**
-     * Adds an AuthorBook association to the book's list.
-     * Ensures bidirectional consistency by setting this book
-     * as the reference in the provided AuthorBook entity.
+     * Adds an AuthorBook association to this book's list and sets the reverse relationship.
      *
-     * @param authorBook the AuthorBook entity to associate with this book
+     * @param authorBook the AuthorBook entity to associate
      */
     public void addAuthorBook(AuthorBookEntity authorBook) {
         if (!authorBooks.contains(authorBook)) {
@@ -147,10 +156,4 @@ public class BookEntity {
             authorBook.setBook(this);
         }
     }
-
-    /**
-     * Note:
-     * The {@code @ToString(exclude = {"author", "bookDetails"})} annotation
-     * avoids recursive printing due to bidirectional relationships.
-     */
 }

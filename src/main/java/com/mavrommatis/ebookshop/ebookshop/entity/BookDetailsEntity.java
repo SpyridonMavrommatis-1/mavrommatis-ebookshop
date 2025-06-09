@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 /**
  * Represents additional details about a Book, such as physical attributes and metadata.
  * <p>
- * This class shares its primary key with the associated Book entity.
+ * This entity is in a one-to-one relationship with {@link BookEntity}, sharing the same primary key.
  */
 @Entity
 @Table(name = "book_details")
@@ -24,21 +24,13 @@ import java.time.LocalDateTime;
 @ToString(exclude = "book")
 public class BookDetailsEntity {
 
-
     /**
      * Shared primary key with Book entity.
-     * Also acts as foreign key due to @MapsId and @JoinColumn.
+     * This ID is not generated independently; it's derived from the associated Book.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_id")
-    private int bookId;
-
-    /**
-     * International Standard Book Number.
-     */
-    @Column(name = "isbn")
-    private String isbn;
+    private Integer bookId;
 
     /**
      * Date of publication.
@@ -60,7 +52,7 @@ public class BookDetailsEntity {
     private String summary;
 
     /**
-     * Physical dimensions of the book.
+     * Physical dimensions of the book (e.g., "20x15x3 cm").
      */
     @Column(name = "dimensions")
     private String dimensions;
@@ -72,26 +64,27 @@ public class BookDetailsEntity {
     private String coverType;
 
     /**
-     * Weight of the book.
+     * Weight of the book in kilograms.
      */
     @Column(name = "weight")
     private BigDecimal weight;
 
     /**
-     * Timestamp when the record is first persisted.
+     * Timestamp when the record was created.
      */
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     /**
-     * Timestamp when the record is last updated.
+     * Timestamp when the record was last updated.
      */
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     /**
-     * Associated Book entity.
-     * Uses LAZY loading and avoids circular reference during serialization.
+     * The owning Book entity.
+     * <p>
+     * Uses lazy loading and avoids circular reference during serialization.
      */
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
@@ -99,28 +92,25 @@ public class BookDetailsEntity {
     @JsonBackReference
     private BookEntity book;
 
-
     /**
-     * Constructs BookDetails with all descriptive fields except the ID and timestamps.
-     * These are set automatically or by the owning Book entity.
+     * Constructs a BookDetailsEntity with all descriptive fields.
+     * The ID and timestamps are handled automatically.
      *
-     * @param weight       the weight of the book
-     * @param coverType    the type of cover
-     * @param dimensions   the book's physical dimensions
-     * @param summary      a brief summary of the book
-     * @param pages        number of pages
-     * @param publishDate  publication date
-     * @param isbn         ISBN number
+     * @param weight      the weight of the book
+     * @param coverType   the type of cover
+     * @param dimensions  the book's physical dimensions
+     * @param summary     a brief summary of the book
+     * @param pages       number of pages
+     * @param publishDate publication date
      */
     public BookDetailsEntity(BigDecimal weight, String coverType, String dimensions,
-                             String summary, int pages, LocalDate publishDate, String isbn) {
+                             String summary, int pages, LocalDate publishDate) {
         this.weight = weight;
         this.coverType = coverType;
         this.dimensions = dimensions;
         this.summary = summary;
         this.pages = pages;
         this.publishDate = publishDate;
-        this.isbn = isbn;
     }
 
     /**
@@ -138,11 +128,4 @@ public class BookDetailsEntity {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
-
-
-    /**
-     * The @ToString annotation excludes the 'book' field
-     * to prevent circular references during logging or debugging.
-     */
 }

@@ -23,60 +23,76 @@ import java.util.List;
 @ToString(exclude = {"authorDetails"})
 public class AuthorEntity {
 
+    /**
+     * The primary key of the author.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "author_id")
     private int authorId;
 
-    @Column(name = "first_name")
+    /**
+     * The first name of the author.
+     */
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name")
+    /**
+     * The last name of the author.
+     */
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    /**
+     * The author's email address.
+     */
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    /**
+     * The timestamp when the author was created.
+     */
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    /**
+     * The timestamp when the author was last updated.
+     */
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     /**
-     * One-to-one relation with AuthorDetails.
+     * One-to-one relation with AuthorDetailsEntity.
      */
     @OneToOne(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private AuthorDetailsEntity authorDetails;
 
     /**
-     * One-to-many relation with Book.
-     * One author can have multiple books.
+     * One-to-many relation with BookEntity.
      */
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<BookEntity> books = new ArrayList<>();
 
     /**
-     * Bidirectional one-to-many relationship with AuthorBook.
-     * Represents the intermediate association between Author and Book.
+     * Many-to-many relation with AuthorBookEntity.
      */
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<AuthorBookEntity> authorBooks = new ArrayList<>();
 
-
     /**
-     * Constructor used to create an Author with first and last name.
-     *
-     * @param firstName the author's first name
-     * @param lastName  the author's last name
+     * Constructor with first name and last name.
      */
-    public AuthorEntity(String firstName, String lastName) {
+    public AuthorEntity(String firstName, String lastName, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = email;
     }
 
     /**
-     * Sets the creation timestamp before persisting the entity.
+     * Sets the creation timestamp.
      */
     @PrePersist
     protected void onCreate() {
@@ -84,7 +100,7 @@ public class AuthorEntity {
     }
 
     /**
-     * Sets the update timestamp before updating the entity.
+     * Sets the update timestamp.
      */
     @PreUpdate
     protected void onUpdate() {
@@ -92,9 +108,7 @@ public class AuthorEntity {
     }
 
     /**
-     * Adds a book to the author and sets the author reference in the book.
-     *
-     * @param book the book to be added
+     * Adds a book to the list and sets the back-reference.
      */
     public void addBook(BookEntity book) {
         if (!books.contains(book)) {
@@ -102,12 +116,9 @@ public class AuthorEntity {
             book.setAuthor(this);
         }
     }
+
     /**
-     * Adds an AuthorBook association to the author's list.
-     * Ensures bidirectional consistency by setting this author
-     * as the reference in the provided AuthorBook entity.
-     *
-     * @param authorBook the AuthorBook entity to associate with this author
+     * Adds an AuthorBook entry to the list and sets the back-reference.
      */
     public void addAuthorBook(AuthorBookEntity authorBook) {
         if (!authorBooks.contains(authorBook)) {
@@ -115,5 +126,4 @@ public class AuthorEntity {
             authorBook.setAuthor(this);
         }
     }
-
 }

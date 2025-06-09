@@ -1,7 +1,7 @@
 package com.mavrommatis.ebookshop.ebookshop.mapper;
 
 import com.mavrommatis.ebookshop.ebookshop.dto.AuthorBookDTO;
-import com.mavrommatis.ebookshop.ebookshop.dto.BookDTO;
+import com.mavrommatis.ebookshop.ebookshop.dto.BookRequestDTO;
 import com.mavrommatis.ebookshop.ebookshop.entity.AuthorBookEntity;
 import com.mavrommatis.ebookshop.ebookshop.entity.BookEntity;
 
@@ -19,10 +19,10 @@ public class BookMapper {
      * @param entity the BookEntity to convert
      * @return the corresponding BookDTO
      */
-    public static BookDTO toBookDTO(BookEntity entity) {
+    public static BookRequestDTO toBookDTO(BookEntity entity) {
         if (entity == null) return null;
 
-        return BookDTO.builder()
+        return BookRequestDTO.builder()
                 .bookId(entity.getBookId())
                 .title(entity.getTitle())
                 .language(entity.getLanguage())
@@ -42,7 +42,7 @@ public class BookMapper {
      * @param dto the BookDTO to convert
      * @return the corresponding BookEntity
      */
-    public static BookEntity toBookEntity(BookDTO dto) {
+    public static BookEntity toBookEntity(BookRequestDTO dto) {
         if (dto == null) return null;
 
         BookEntity entity = new BookEntity();
