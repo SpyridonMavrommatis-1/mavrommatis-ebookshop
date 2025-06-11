@@ -1,183 +1,128 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
+import com.mavrommatis.ebookshop.ebookshop.dao.AuthorRepository;
 import com.mavrommatis.ebookshop.ebookshop.dao.BookRepository;
+import com.mavrommatis.ebookshop.ebookshop.dto.BookRequestDTO;
+import com.mavrommatis.ebookshop.ebookshop.dto.BookResponseDTO;
 import com.mavrommatis.ebookshop.ebookshop.entity.AuthorEntity;
-import com.mavrommatis.ebookshop.ebookshop.entity.BookEntity;
 import com.mavrommatis.ebookshop.ebookshop.entity.BookDetailsEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.BookEntity;
+import com.mavrommatis.ebookshop.ebookshop.mapper.BookMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Implementation of {@link BookService} interface.
- * Provides business logic and interaction with the BookRepository.
+ * Service implementation for {@link BookService}, handling business logic
+ * and mapping between DTOs and entities via {@link BookMapper}.
  */
 @Service
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
-
-    private final AuthorService authorService;
+    private final AuthorRepository authorRepository;
+    private final BookMapper bookMapper;
 
     /**
-     * Constructor-based injection of dependencies.
+     * Constructor for dependency injection.
      *
-     * @param bookRepository the repository used to access books
-     * @param authorService the service used to manage authors
+     * @param bookRepository    repository for persisting books
+     * @param authorRepository  repository for fetching authors
+     * @param bookMapper        mapper for converting between DTOs and entities
      */
     @Autowired
-    public BookServiceImpl(BookRepository bookRepository, AuthorService authorService) {
-        this.bookRepository = bookRepository;
-        this.authorService = authorService;
+    public BookServiceImpl(BookRepository bookRepository,
+                           AuthorRepository authorRepository,
+                           BookMapper bookMapper) {
+        this.bookRepository   = bookRepository;
+        this.authorRepository = authorRepository;
+        this.bookMapper       = bookMapper;
     }
 
     /**
-     * Retrieve all books from the database.
-     *
-     * @return a list of all {@link BookEntity} entities
+     * {@inheritDoc}
      */
     @Override
-    public List<BookEntity> findAll() {
-        return bookRepository.findAll();
+    public List<BookResponseDTO> findAll() {
+        return bookRepository.findAll().stream()
+                .map(bookMapper::toResponse)
+                .toList();
     }
 
     /**
-     * Retrieve a book by its ID.
-     *
-     * @param id the ID of the book
-     * @return an {@link Optional} containing the book if found, or empty otherwise
+     * {@inheritDoc}
      */
     @Override
-    public Optional<BookEntity> findById(Integer id) {
-        return bookRepository.findById(id);
+    public BookResponseDTO findById(Integer id) {
+        BookEntity entity = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found: " + id));
+        return bookMapper.toResponse(entity);
     }
 
     /**
-     * Save a new book if it doesn't already exist in the database.
-     *
-     * @param book the book entity to save
-     * @return the saved {@link BookEntity}
-     * @throws RuntimeException if the book already exists
-     */
-    @Override
-    public BookEntity save(BookEntity book) {
-        if (book.getBookId() != 0 && bookRepository.existsById(book.getBookId())) {
-            throw new RuntimeException("Book already exists with id: " + book.getBookId());
-        }
-        return bookRepository.save(book);
-    }
-
-    /**
-     * Save multiple books at once, checking each for existence.
-     *
-     * @param books a list of books to save
-     * @return the saved list of books
-     * @throws RuntimeException if any book already exists
+     * {@inheritDoc}
      */
     @Override
     @Transactional
-    public List<BookEntity> saveAll(List<BookEntity> books) {
-        for (BookEntity book : books) {
-            if (book.getBookId() != 0 && bookRepository.existsById(book.getBookId())) {
-                throw new RuntimeException("Book already exists with id: " + book.getBookId());
-            }
+    public BookResponseDTO save(BookRequestDTO dto) {
+        BookEntity book = bookMapper.toEntity(dto);
+        if (dto.getDetails() != null) {
+            BookDetailsEntity details = bookMapper.bookDetailsDtoToEntity(dto.getDetails());
+            details.setBook(book);
+            book.setBookDetails(details);
         }
-        return bookRepository.saveAll(books);
+        AuthorEntity author = authorRepository.findById(dto.getAuthorId())
+                .orElseThrow(() -> new RuntimeException("Author not found: " + dto.getAuthorId()));
+        book.setAuthor(author);
+
+        BookEntity saved = bookRepository.save(book);
+        return bookMapper.toResponse(saved);
     }
 
     /**
-     * Updates an existing {@link BookEntity} in the database, ensuring safe merging of nested entities.
-     * <p>
-     * This method retrieves the managed instance of the book from the database, then updates its fields
-     * and relationships (such as {@link BookDetailsEntity} and {@link AuthorEntity}) carefully, avoiding conflicts
-     * caused by multiple objects with the same identifier in the persistence context.
-     *
-     * @param book the {@link BookEntity} entity containing updated values (from client input)
-     * @return the updated and saved {@link BookEntity} entity
-     * @throws RuntimeException if the book or the associated author does not exist
+     * {@inheritDoc}
      */
     @Override
-    public BookEntity update(BookEntity book) {
-        int bookId = book.getBookId();
-
-        if (bookId == 0 || !bookRepository.existsById(bookId)) {
-            throw new RuntimeException("Cannot update. Book not found with id: " + bookId);
+    @Transactional
+    public BookResponseDTO update(Integer id, BookRequestDTO dto) {
+        if (!bookRepository.existsById(id)) {
+            throw new RuntimeException("Cannot update. Book not found: " + id);
         }
+        BookEntity existing = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found: " + id));
+        bookMapper.updateEntity(dto, existing);
+        AuthorEntity author = authorRepository.findById(dto.getAuthorId())
+                .orElseThrow(() -> new RuntimeException("Author not found: " + dto.getAuthorId()));
+        existing.setAuthor(author);
 
-        // Fetch the managed Book entity from the database
-        BookEntity existingBook = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
-
-        // Update primitive fields of Book
-        existingBook.setTitle(book.getTitle());
-        existingBook.setLanguage(book.getLanguage());
-        existingBook.setGenre(book.getGenre());
-        existingBook.setLiteraryForm(book.getLiteraryForm());
-
-        // Handle BookDetails relationship carefully to avoid NonUniqueObjectException
-        BookDetailsEntity newDetails = book.getBookDetails();
-        if (newDetails != null) {
-            BookDetailsEntity managedDetails = existingBook.getBookDetails();
-            if (managedDetails == null) {
-                newDetails.setBook(existingBook);
-                existingBook.setBookDetails(newDetails);
-            } else {
-                managedDetails.setSummary(newDetails.getSummary());
-                managedDetails.setIsbn(newDetails.getIsbn());
-                managedDetails.setPages(newDetails.getPages());
-                managedDetails.setDimensions(newDetails.getDimensions());
-                managedDetails.setCoverType(newDetails.getCoverType());
-                managedDetails.setWeight(newDetails.getWeight());
-                managedDetails.setPublishDate(newDetails.getPublishDate());
-            }
-        }
-
-        // Handle Author relationship
-        if (book.getAuthor() != null && book.getAuthor().getAuthorId() != 0) {
-            AuthorEntity managedAuthor = authorService.findById(book.getAuthor().getAuthorId())
-                    .orElseThrow(() -> new RuntimeException("Author not found with id: " + book.getAuthor().getAuthorId()));
-            existingBook.setAuthor(managedAuthor);
-            managedAuthor.addBook(existingBook); // maintain bidirectional consistency
-        }
-
-        // Save the updated Book
-        return bookRepository.save(existingBook);
+        BookEntity updated = bookRepository.save(existing);
+        return bookMapper.toResponse(updated);
     }
 
     /**
-     * Delete a book by its ID if it exists.
-     *
-     * @param id the ID of the book to delete
-     * @throws RuntimeException if the book is not found
+     * {@inheritDoc}
      */
     @Override
     public void deleteById(Integer id) {
-        Optional<BookEntity> book = bookRepository.findById(id);
-
-        if (book.isPresent()) {
-            bookRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Book not found with id: " + id);
+        if (!bookRepository.existsById(id)) {
+            throw new RuntimeException("Book not found: " + id);
         }
+        bookRepository.deleteById(id);
     }
 
     /**
-     * Delete multiple books by their IDs if they exist.
-     *
-     * @param ids a list of book IDs to delete
-     * @throws RuntimeException if any of the books are not found
+     * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void deleteAllById(List<Integer> ids) {
         for (Integer id : ids) {
-            if (bookRepository.existsById(id)) {
-                bookRepository.deleteById(id);
-            } else {
-                throw new RuntimeException("Book not found with id: " + id);
+            if (!bookRepository.existsById(id)) {
+                throw new RuntimeException("Book not found: " + id);
             }
         }
+        bookRepository.deleteAllById(ids);
     }
 }

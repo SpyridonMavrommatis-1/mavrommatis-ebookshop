@@ -1,70 +1,64 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.BookEntity;
-
+import com.mavrommatis.ebookshop.ebookshop.dto.BookRequestDTO;
+import com.mavrommatis.ebookshop.ebookshop.dto.BookResponseDTO;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Service interface for managing {@link BookEntity} entities.
- * Defines methods for CRUD operations related to books.
+ * Service interface for managing Book operations via DTOs.
+ * <p>
+ * Defines methods for CRUD operations that accept and return DTOs,
+ * abstracting away persistence details from the client.
  */
 public interface BookService {
 
     /**
      * Retrieve all books from the database.
      *
-     * @return a list of all {@link BookEntity} entities
+     * @return a list of {@link BookResponseDTO} representing all books
      */
-    List<BookEntity> findAll();
+    List<BookResponseDTO> findAll();
 
     /**
-     * Retrieve a book by its unique ID.
+     * Retrieve a specific book by its ID.
      *
-     * @param id the ID of the book
-     * @return an {@link Optional} containing the {@link BookEntity}, if found
+     * @param id the unique identifier of the book
+     * @return a {@link BookResponseDTO} of the found book
+     * @throws RuntimeException if no book is found with the given ID
      */
-    Optional<BookEntity> findById(Integer id);
+    BookResponseDTO findById(Integer id);
 
     /**
-     * Save a single book to the database.
+     * Create a new book in the system.
      *
-     * @param book the book to be saved
-     * @return the saved {@link BookEntity} entity
+     * @param dto the {@link BookRequestDTO} containing book data
+     * @return a {@link BookResponseDTO} of the created book
      */
-    BookEntity save(BookEntity book);
+    BookResponseDTO save(BookRequestDTO dto);
 
     /**
-     * Save multiple books to the database at once.
+     * Update an existing book.
      *
-     * @param books a list of books to be saved
-     * @return the list of saved {@link BookEntity} entities
+     * @param id  the ID of the book to update
+     * @param dto the {@link BookRequestDTO} containing updated book data
+     * @return a {@link BookResponseDTO} of the updated book
+     * @throws RuntimeException if no book exists with the given ID
      */
-    List<BookEntity> saveAll(List<BookEntity> books);
+    BookResponseDTO update(Integer id, BookRequestDTO dto);
 
     /**
-     * Update an existing book in the database.
-     * The book must have a valid ID and already exist in the database.
+     * Delete a book by its ID.
      *
-     * @param book the {@link BookEntity} entity containing updated fields
-     * @return the updated {@link BookEntity}
-     * @throws RuntimeException if the book does not exist
-     */
-    BookEntity update(BookEntity book);
-
-
-    /**
-     * Delete a book by its ID, if it exists.
-     *
-     * @param id the ID of the book to be deleted
+     * @param id the ID of the book to delete
+     * @throws RuntimeException if no book exists with the given ID
      */
     void deleteById(Integer id);
 
     /**
-     * Delete multiple books by their IDs, if they exist.
+     * Delete multiple books by their IDs.
      *
-     * @param ids a list of IDs for the books to be deleted
+     * @param ids a list of book IDs to delete
+     * @throws RuntimeException if any book ID is not found
      */
     void deleteAllById(List<Integer> ids);
 }
-

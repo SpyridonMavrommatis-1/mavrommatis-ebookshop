@@ -1,58 +1,64 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetailsEntity;
-
+import com.mavrommatis.ebookshop.ebookshop.dto.CustomerDetailsDTO;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Service interface for managing {@link CustomerDetailsEntity} entities.
- * Provides methods for retrieving, saving, and deleting customer detail records.
+ * Service interface for managing customer detail data via DTOs.
+ * <p>
+ * Provides CRUD operations for customer profile information,
+ * decoupling persistence entities from the client API.
  */
 public interface CustomerDetailsService {
 
     /**
-     * Retrieve all customer details from the database.
+     * Retrieve all customer detail records.
      *
-     * @return a list of all {@link CustomerDetailsEntity}
+     * @return list of {@link CustomerDetailsDTO} representing all profiles
      */
-    List<CustomerDetailsEntity> findAll();
+    List<CustomerDetailsDTO> findAll();
 
     /**
-     * Find customer details by their ID.
+     * Retrieve a single customer detail by its customer ID.
      *
-     * @param id the ID of the customer details record
-     * @return an {@link Optional} containing the customer details if found, or empty otherwise
+     * @param customerId the unique identifier of the customer
+     * @return the corresponding {@link CustomerDetailsDTO}
+     * @throws RuntimeException if no record is found for the given ID
      */
-    Optional<CustomerDetailsEntity> findById(Integer id);
+    CustomerDetailsDTO findById(Integer customerId);
 
     /**
-     * Save a new customer details entry to the database.
+     * Create or update customer detail information.
+     * <p>
+     * If a record exists for the given ID, it is updated; otherwise a new record is created.
+     * </p>
      *
-     * @param customerDetails the customer details entity to save
-     * @return the saved {@link CustomerDetailsEntity}
+     * @param dto the {@link CustomerDetailsDTO} containing detail data
+     * @return the persisted {@link CustomerDetailsDTO}
      */
-    CustomerDetailsEntity save(CustomerDetailsEntity customerDetails);
+    CustomerDetailsDTO save(CustomerDetailsDTO dto);
 
     /**
-     * Save a list of customer details entries to the database.
+     * Batch create or update multiple customer detail records.
      *
-     * @param customerDetails a list of customer details entities to save
-     * @return the saved list of {@link CustomerDetailsEntity}
+     * @param dtos list of {@link CustomerDetailsDTO} to persist
+     * @return list of persisted {@link CustomerDetailsDTO}
      */
-    List<CustomerDetailsEntity> saveAll(List<CustomerDetailsEntity> customerDetails);
+    List<CustomerDetailsDTO> saveAll(List<CustomerDetailsDTO> dtos);
 
     /**
-     * Delete a customer details record by its ID if it exists.
+     * Delete a customer detail record by its customer ID.
      *
-     * @param id the ID of the customer details to delete
+     * @param customerId the ID of the customer to delete details for
+     * @throws RuntimeException if no record exists for the given ID
      */
-    void deleteById(Integer id);
+    void deleteById(Integer customerId);
 
     /**
-     * Delete multiple customer details records by their IDs if they exist.
+     * Delete multiple customer detail records by their customer IDs.
      *
-     * @param ids a list of IDs to delete
+     * @param customerIds list of customer IDs whose details to delete
+     * @throws RuntimeException if any provided ID is not found
      */
-    void deleteAllById(List<Integer> ids);
+    void deleteAllById(List<Integer> customerIds);
 }

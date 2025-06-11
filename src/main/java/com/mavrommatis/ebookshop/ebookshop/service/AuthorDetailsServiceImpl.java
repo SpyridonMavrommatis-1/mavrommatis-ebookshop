@@ -1,114 +1,89 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
 import com.mavrommatis.ebookshop.ebookshop.dao.AuthorDetailsRepository;
+import com.mavrommatis.ebookshop.ebookshop.dto.AuthorDetailsDTO;
 import com.mavrommatis.ebookshop.ebookshop.entity.AuthorDetailsEntity;
+import com.mavrommatis.ebookshop.ebookshop.mapper.AuthorMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
- * Service implementation for {@link AuthorDetailsService}.
- * Handles business logic related to the {@link AuthorDetailsEntity} entity.
+ * Service implementation for {@link AuthorDetailsService}, mapping via {@link AuthorMapper}.
  */
 @Service
 public class AuthorDetailsServiceImpl implements AuthorDetailsService {
 
-    private final AuthorDetailsRepository authorDetailsRepository;
+    private final AuthorDetailsRepository repository;
+    private final AuthorMapper mapper;
 
     /**
-     * Constructor-based dependency injection of the repository.
+     * Constructor injection of repository and mapper.
      *
-     * @param authorDetailsRepository repository for AuthorDetails.
+     * @param repository the DAO for AuthorDetailsEntity
+     * @param mapper     the mapper for DTO ⇄ Entity conversions
      */
-    public AuthorDetailsServiceImpl(AuthorDetailsRepository authorDetailsRepository) {
-        this.authorDetailsRepository = authorDetailsRepository;
+    public AuthorDetailsServiceImpl(AuthorDetailsRepository repository,
+                                    AuthorMapper mapper) {
+        this.repository = repository;
+        this.mapper     = mapper;
     }
 
-    /**
-     * Retrieve all AuthorDetails records from the database.
-     *
-     * @return list of AuthorDetails.
-     */
     @Override
-    public List<AuthorDetailsEntity> findAll() {
-        return authorDetailsRepository.findAll();
+    public List<AuthorDetailsDTO> findAll() {
+        return repository.findAll().stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Retrieve an AuthorDetails record by its ID.
-     *
-     * @param id the ID to search.
-     * @return an Optional of AuthorDetails.
-     */
     @Override
-    public Optional<AuthorDetailsEntity> findById(Integer id) {
-        return authorDetailsRepository.findById(id);
+    public AuthorDetailsDTO findById(Integer authorId) {
+        AuthorDetailsEntity entity = repository.findById(authorId)
+                .orElseThrow(() -> new RuntimeException("AuthorDetails not found: " + authorId));
+        return mapper.toDto(entity);
     }
 
-    /**
-     * Save a new AuthorDetails record.
-     * Throws an exception if the ID already exists.
-     *
-     * @param authorDetails the AuthorDetails to save.
-     * @return the saved entity.
-     */
     @Override
-    public AuthorDetailsEntity save(AuthorDetailsEntity authorDetails) {
-        if (authorDetails.getAuthorId() != 0 && authorDetailsRepository.existsById(authorDetails.getAuthorId())) {
-            throw new RuntimeException("AuthorDetails already exists with id: " + authorDetails.getAuthorId());
+    @Transactional
+    public AuthorDetailsDTO save(AuthorDetailsDTO dto) {
+        // Map DTO → Entity
+        AuthorDetailsEntity entity = mapper.toEntity(dto);
+        // Persist (insert or update)
+        AuthorDetailsEntity saved = repository.save(entity);
+        // Map back → DTO
+        return mapper.toDto(saved);
+    }
+
+    @Override
+    @Transactional
+    public List<AuthorDetailsDTO> saveAll(List<AuthorDetailsDTO> dtos) {
+        List<AuthorDetailsEntity> entities = dtos.stream()
+                .map(mapper::toEntity)
+                .collect(Collectors.toList());
+        List<AuthorDetailsEntity> saved = repository.saveAll(entities);
+        return saved.stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteById(Integer authorId) {
+        if (!repository.existsById(authorId)) {
+            throw new RuntimeException("AuthorDetails not found: " + authorId);
         }
-        return authorDetailsRepository.save(authorDetails);
+        repository.deleteById(authorId);
     }
 
-    /**
-     * Save a list of AuthorDetails.
-     * Each entry is validated before saving.
-     *
-     * @param authorsDetails list of AuthorDetails.
-     * @return list of saved AuthorDetails.
-     */
     @Override
-    public List<AuthorDetailsEntity> saveAll(List<AuthorDetailsEntity> authorsDetails) {
-        for (AuthorDetailsEntity authorDetails : authorsDetails) {
-            if (authorDetails.getAuthorId() != 0 && authorDetailsRepository.existsById(authorDetails.getAuthorId())) {
-                throw new RuntimeException("AuthorDetails already exists with id: " + authorDetails.getAuthorId());
+    @Transactional
+    public void deleteAllById(List<Integer> authorIds) {
+        for (Integer id : authorIds) {
+            if (!repository.existsById(id)) {
+                throw new RuntimeException("AuthorDetails not found: " + id);
             }
         }
-        return authorDetailsRepository.saveAll(authorsDetails);
-    }
-
-    /**
-     * Delete an AuthorDetails record by ID.
-     * Throws exception if the ID does not exist.
-     *
-     * @param id ID to delete.
-     */
-    @Override
-    public void deleteById(Integer id) {
-        Optional<AuthorDetailsEntity> authorDetails = authorDetailsRepository.findById(id);
-
-        if (authorDetails.isPresent()) {
-            authorDetailsRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("AuthorDetails not found with id: " + id);
-        }
-    }
-
-    /**
-     * Delete a list of AuthorDetails records by their IDs.
-     * If any ID does not exist, exception is thrown.
-     *
-     * @param ids list of IDs to delete.
-     */
-    @Override
-    public void deleteAllById(List<Integer> ids) {
-        for (Integer id : ids) {
-            if (authorDetailsRepository.existsById(id)) {
-                authorDetailsRepository.deleteById(id);
-            } else {
-                throw new RuntimeException("AuthorDetails not found with id: " + id);
-            }
-        }
+        repository.deleteAllById(authorIds);
     }
 }

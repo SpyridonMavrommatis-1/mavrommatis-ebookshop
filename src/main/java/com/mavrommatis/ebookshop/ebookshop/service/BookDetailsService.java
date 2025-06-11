@@ -1,59 +1,52 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.BookDetailsEntity;
+import com.mavrommatis.ebookshop.ebookshop.dto.BookDetailsDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Service interface for managing {@link BookDetailsEntity} entities.
- * Defines CRUD operations for working with detailed book information.
+ * Service interface for managing detailed book metadata via DTOs.
  */
 public interface BookDetailsService {
 
     /**
-     * Retrieve all book details records from the database.
-     *
-     * @return a list of all {@link BookDetailsEntity}
+     * Retrieve all book details.
+     * @return list of {@link BookDetailsDTO}
      */
-    List<BookDetailsEntity> findAll();
+    List<BookDetailsDTO> findAll();
 
     /**
-     * Retrieve a specific {@link BookDetailsEntity} record by its ID.
-     *
-     * @param id the ID of the book details
-     * @return an {@link Optional} containing the found entity or empty if not found
+     * Retrieve a specific book details record.
+     * @param id the book ID
+     * @return the {@link BookDetailsDTO}
+     * @throws RuntimeException if not found
      */
-    Optional<BookDetailsEntity> findById(Integer id);
+    BookDetailsDTO findById(Integer id);
 
     /**
-     * Save a new {@link BookDetailsEntity} record to the database.
-     * If the record already exists, it will be updated.
-     *
-     * @param bookDetails the book details to save
-     * @return the saved {@link BookDetailsEntity} entity
+     * Create or update book details.
+     * @param dto the {@link BookDetailsDTO} to save
+     * @return the saved {@link BookDetailsDTO}
      */
-    BookDetailsEntity save(BookDetailsEntity bookDetails);
+    BookDetailsDTO save(BookDetailsDTO dto);
 
     /**
-     * Save multiple {@link BookDetailsEntity} records at once.
-     *
-     * @param bookDetails a list of book details to save
-     * @return a list of saved {@link BookDetailsEntity} entities
+     * Create or update multiple book details at once.
+     * @param dtos list of {@link BookDetailsDTO}
+     * @return list of saved {@link BookDetailsDTO}
      */
-    List<BookDetailsEntity> saveAll(List<BookDetailsEntity> bookDetails);
+    List<BookDetailsDTO> saveAll(List<BookDetailsDTO> dtos);
 
     /**
-     * Delete a specific {@link BookDetailsEntity} record by its ID if it exists.
-     *
-     * @param id the ID of the book details to delete
+     * Delete book details by book ID.
+     * @param id the book ID
+     * @throws RuntimeException if not found
      */
     void deleteById(Integer id);
 
     /**
-     * Delete multiple {@link BookDetailsEntity} records by their IDs if they exist.
-     *
-     * @param ids a list of IDs representing book details to delete
+     * Delete multiple book details by book IDs.
+     * @param ids list of book IDs
      */
     void deleteAllById(List<Integer> ids);
 }

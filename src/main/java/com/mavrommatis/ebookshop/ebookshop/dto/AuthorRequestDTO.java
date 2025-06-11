@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-class AuthorRequestDTO {
+public class AuthorRequestDTO {
 
     /**
      * Author's first name.

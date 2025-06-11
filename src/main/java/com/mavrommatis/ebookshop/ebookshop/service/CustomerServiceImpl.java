@@ -1,114 +1,135 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
 import com.mavrommatis.ebookshop.ebookshop.dao.CustomerRepository;
+import com.mavrommatis.ebookshop.ebookshop.dto.CustomerRequestDTO;
+import com.mavrommatis.ebookshop.ebookshop.dto.CustomerResponseDTO;
+import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetailsEntity;
 import com.mavrommatis.ebookshop.ebookshop.entity.CustomerEntity;
+import com.mavrommatis.ebookshop.ebookshop.mapper.CustomerMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
- * Implementation of the {@link CustomerService} interface.
- * Handles business logic for managing {@link CustomerEntity} entities.
+ * Service implementation for {@link CustomerService}, handling business logic
+ * and mapping between DTOs and entities via {@link CustomerMapper}.
  */
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-    private final CustomerRepository customerRepository;
+    private final CustomerRepository repository;
+    private final CustomerMapper mapper;
 
     /**
-     * Constructor for injecting the {@link CustomerRepository}.
+     * Constructs a new CustomerServiceImpl with required dependencies.
      *
-     * @param customerRepository the repository for customer data access
+     * @param repository the repository for Customer entities
+     * @param mapper     the mapper for converting between DTOs and entities
      */
-    public CustomerServiceImpl(CustomerRepository customerRepository) {
-        this.customerRepository = customerRepository;
+    @Autowired
+    public CustomerServiceImpl(CustomerRepository repository,
+                               CustomerMapper mapper) {
+        this.repository = repository;
+        this.mapper     = mapper;
     }
 
     /**
-     * Retrieve all customers from the database.
-     *
-     * @return a list of all {@link CustomerEntity} entities
+     * {@inheritDoc}
      */
     @Override
-    public List<CustomerEntity> findAll() {
-        return customerRepository.findAll();
+    public List<CustomerResponseDTO> findAll() {
+        return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     /**
-     * Find a customer by ID.
-     *
-     * @param id the customer ID
-     * @return an {@link Optional} containing the customer if found, otherwise empty
+     * {@inheritDoc}
      */
     @Override
-    public Optional<CustomerEntity> findById(Integer id) {
-        return customerRepository.findById(id);
+    public CustomerResponseDTO findById(Integer id) {
+        CustomerEntity entity = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found: " + id));
+        return mapper.toResponse(entity);
     }
 
     /**
-     * Save a new customer if they do not already exist.
-     *
-     * @param customer the {@link CustomerEntity} entity to save
-     * @return the saved {@link CustomerEntity}
-     * @throws RuntimeException if a customer with the same ID already exists
+     * {@inheritDoc}
      */
     @Override
-    public CustomerEntity save(CustomerEntity customer) {
-        if (customer.getCustomerId() != 0 && customerRepository.existsById(customer.getCustomerId())) {
-            throw new RuntimeException("Customer already exists with id: " + customer.getCustomerId());
+    @Transactional
+    public CustomerResponseDTO save(CustomerRequestDTO dto) {
+        CustomerEntity customer = mapper.toEntity(dto);
+        if (dto.getCustomerDetails() != null) {
+            CustomerDetailsEntity details = mapper.toEntity(dto.getCustomerDetails());
+            details.setCustomer(customer);
+            customer.setCustomerDetails(details);
         }
-        return customerRepository.save(customer);
+        CustomerEntity saved = repository.save(customer);
+        return mapper.toResponse(saved);
     }
 
     /**
-     * Save a list of customers if none of them already exist.
-     *
-     * @param customers a list of {@link CustomerEntity} entities to save
-     * @return a list of saved {@link CustomerEntity} entities
-     * @throws RuntimeException if any customer already exists
+     * {@inheritDoc}
      */
     @Override
-    public List<CustomerEntity> saveAll(List<CustomerEntity> customers) {
-        for (CustomerEntity customer : customers) {
-            if (customer.getCustomerId() != 0 && customerRepository.existsById(customer.getCustomerId())) {
-                throw new RuntimeException("Customer already exists with id: " + customer.getCustomerId());
+    @Transactional
+    public CustomerResponseDTO update(Integer id, CustomerRequestDTO dto) {
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("Cannot update. Customer not found: " + id);
+        }
+        CustomerEntity existing = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found: " + id));
+
+        // Update basic fields
+        existing.setUsername(dto.getUsername());
+        existing.setPassword(dto.getPassword());
+        existing.setEmail(dto.getEmail());
+
+        // Handle nested details
+        if (dto.getCustomerDetails() != null) {
+            CustomerDetailsEntity newDetails = mapper.toEntity(dto.getCustomerDetails());
+            if (existing.getCustomerDetails() == null) {
+                newDetails.setCustomer(existing);
+                existing.setCustomerDetails(newDetails);
+            } else {
+                CustomerDetailsEntity managed = existing.getCustomerDetails();
+                managed.setFirstName(newDetails.getFirstName());
+                managed.setLastName(newDetails.getLastName());
+                managed.setAddress(newDetails.getAddress());
+                managed.setPhone(newDetails.getPhone());
             }
         }
-        return customerRepository.saveAll(customers);
+
+        CustomerEntity updated = repository.save(existing);
+        return mapper.toResponse(updated);
     }
 
     /**
-     * Delete a customer by ID if they exist.
-     *
-     * @param id the customer ID
-     * @throws RuntimeException if no customer is found with the given ID
+     * {@inheritDoc}
      */
     @Override
     public void deleteById(Integer id) {
-        Optional<CustomerEntity> customer = customerRepository.findById(id);
-
-        if (customer.isPresent()) {
-            customerRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Customer not found with id: " + id);
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("Customer not found: " + id);
         }
+        repository.deleteById(id);
     }
 
     /**
-     * Delete multiple customers by ID. Fails if any ID is not found.
-     *
-     * @param ids the list of customer IDs to delete
-     * @throws RuntimeException if any ID is not found
+     * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void deleteAllById(List<Integer> ids) {
         for (Integer id : ids) {
-            if (customerRepository.existsById(id)) {
-                customerRepository.deleteById(id);
-            } else {
-                throw new RuntimeException("Customer not found with id: " + id);
+            if (!repository.existsById(id)) {
+                throw new RuntimeException("Customer not found: " + id);
             }
         }
+        repository.deleteAllById(ids);
     }
 }

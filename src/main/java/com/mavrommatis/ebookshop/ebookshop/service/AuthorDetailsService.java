@@ -1,60 +1,63 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.AuthorDetailsEntity;
-
+import com.mavrommatis.ebookshop.ebookshop.dto.AuthorDetailsDTO;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Service interface for managing {@link AuthorDetailsEntity} entities.
- * Defines the contract for business logic related to author personal information.
+ * Service interface for managing AuthorDetails via DTOs.
+ * <p>
+ * Hides persistence and entity details from the client layer.
  */
 public interface AuthorDetailsService {
 
     /**
-     * Retrieve all {@link AuthorDetailsEntity} records from the database.
+     * Retrieve all author‐detail records.
      *
-     * @return a list of all AuthorDetails.
+     * @return a list of {@link AuthorDetailsDTO}
      */
-    List<AuthorDetailsEntity> findAll();
+    List<AuthorDetailsDTO> findAll();
 
     /**
-     * Retrieve a specific {@link AuthorDetailsEntity} record by its ID.
+     * Retrieve a single author‐detail record by author ID.
      *
-     * @param id the unique identifier of the author details.
-     * @return an {@link Optional} containing the AuthorDetails if found, or empty if not.
+     * @param authorId the author's ID
+     * @return the corresponding {@link AuthorDetailsDTO}
+     * @throws RuntimeException if not found
      */
-    Optional<AuthorDetailsEntity> findById(Integer id);
+    AuthorDetailsDTO findById(Integer authorId);
 
     /**
-     * Save a new or updated {@link AuthorDetailsEntity} record.
+     * Create or update an author‐detail record.
+     * <p>
+     * If a record with the same authorId exists, it will be updated; otherwise a new one is inserted.
+     * </p>
      *
-     * @param authorDetails the AuthorDetails entity to be saved.
-     * @return the persisted AuthorDetails instance.
+     * @param dto the {@link AuthorDetailsDTO} to save
+     * @return the saved {@link AuthorDetailsDTO}
      */
-    AuthorDetailsEntity save(AuthorDetailsEntity authorDetails);
+    AuthorDetailsDTO save(AuthorDetailsDTO dto);
 
     /**
-     * Save multiple {@link AuthorDetailsEntity} records in a single batch operation.
+     * Batch create or update multiple author‐detail records.
      *
-     * @param authorDetails list of AuthorDetails entities to save.
-     * @return list of saved AuthorDetails instances.
+     * @param dtos list of {@link AuthorDetailsDTO} to persist
+     * @return list of persisted {@link AuthorDetailsDTO}
      */
-    List<AuthorDetailsEntity> saveAll(List<AuthorDetailsEntity> authorDetails);
+    List<AuthorDetailsDTO> saveAll(List<AuthorDetailsDTO> dtos);
 
     /**
-     * Delete an {@link AuthorDetailsEntity} record by its ID.
-     * If the ID doesn't exist, no action is performed.
+     * Delete an author‐detail record by author ID.
      *
-     * @param id the ID of the record to delete.
+     * @param authorId the author's ID
+     * @throws RuntimeException if no such record exists
      */
-    void deleteById(Integer id);
+    void deleteById(Integer authorId);
 
     /**
-     * Delete multiple {@link AuthorDetailsEntity} records by their IDs.
-     * Non-existing IDs are ignored.
+     * Delete multiple author‐detail records by their author IDs.
      *
-     * @param ids list of IDs to be deleted.
+     * @param authorIds list of author IDs to delete
+     * @throws RuntimeException if any ID is not found
      */
-    void deleteAllById(List<Integer> ids);
+    void deleteAllById(List<Integer> authorIds);
 }

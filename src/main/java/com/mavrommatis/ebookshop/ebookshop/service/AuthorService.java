@@ -1,58 +1,64 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.AuthorEntity;
-
+import com.mavrommatis.ebookshop.ebookshop.dto.AuthorRequestDTO;
+import com.mavrommatis.ebookshop.ebookshop.dto.AuthorResponseDTO;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Service interface for managing {@link AuthorEntity} entities.
- * Defines the contract for operations related to authors.
+ * Service interface for managing Author operations via DTOs.
+ * <p>
+ * Defines methods for CRUD operations that accept and return DTOs,
+ * abstracting away persistence details from the client.
  */
 public interface AuthorService {
 
     /**
-     * Retrieve all authors from the database.
+     * Retrieve all authors.
      *
-     * @return a list of all authors.
+     * @return list of {@link AuthorResponseDTO}
      */
-    List<AuthorEntity> findAll();
+    List<AuthorResponseDTO> findAll();
 
     /**
      * Retrieve a specific author by ID.
      *
-     * @param id the ID of the author to find.
-     * @return an Optional containing the author if found, or empty otherwise.
+     * @param id author identifier
+     * @return {@link AuthorResponseDTO} of the found author
+     * @throws RuntimeException if no author is found
      */
-    Optional<AuthorEntity> findById(Integer id);
+    AuthorResponseDTO findById(Integer id);
 
     /**
-     * Save a new author to the database.
+     * Create a new author.
      *
-     * @param author the author to be saved.
-     * @return the saved author entity.
+     * @param dto the {@link AuthorRequestDTO} containing author data
+     * @return {@link AuthorResponseDTO} of the created author
      */
-    AuthorEntity save(AuthorEntity author);
+    AuthorResponseDTO save(AuthorRequestDTO dto);
 
     /**
-     * Save multiple authors to the database.
+     * Update an existing author.
      *
-     * @param authors list of authors to be saved.
-     * @return list of saved author entities.
+     * @param id  author identifier
+     * @param dto the {@link AuthorRequestDTO} containing updated data
+     * @return {@link AuthorResponseDTO} of the updated author
+     * @throws RuntimeException if no author exists with the given ID
      */
-    List<AuthorEntity> saveAll(List<AuthorEntity> authors);
+    AuthorResponseDTO update(Integer id, AuthorRequestDTO dto);
 
     /**
-     * Delete an author by its ID.
+     * Delete an author by ID.
      *
-     * @param id the ID of the author to be deleted.
+     * @param id author identifier
+     * @throws RuntimeException if no author exists with the given ID
      */
     void deleteById(Integer id);
 
     /**
      * Delete multiple authors by their IDs.
      *
-     * @param ids list of IDs of authors to be deleted.
+     * @param ids list of author identifiers
+     * @throws RuntimeException if any ID is not found
      */
     void deleteAllById(List<Integer> ids);
 }

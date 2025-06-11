@@ -27,7 +27,6 @@ public class CustomerDetailsEntity {
      * Primary key and foreign key. Shared with the Customer entity.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id")
     private int customerId;
 

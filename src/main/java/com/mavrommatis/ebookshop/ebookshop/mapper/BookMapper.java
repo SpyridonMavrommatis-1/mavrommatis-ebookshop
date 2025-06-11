@@ -1,106 +1,78 @@
 package com.mavrommatis.ebookshop.ebookshop.mapper;
 
-import com.mavrommatis.ebookshop.ebookshop.dto.AuthorBookDTO;
-import com.mavrommatis.ebookshop.ebookshop.dto.BookRequestDTO;
-import com.mavrommatis.ebookshop.ebookshop.entity.AuthorBookEntity;
-import com.mavrommatis.ebookshop.ebookshop.entity.BookEntity;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import com.mavrommatis.ebookshop.ebookshop.dto.*;
+import com.mavrommatis.ebookshop.ebookshop.entity.*;
+import org.mapstruct.*;
 
 /**
- * Mapper class for converting between BookEntity and BookDTO.
+ * Mapper for converting between Book entities and DTOs.
  */
-public class BookMapper {
+@Mapper(componentModel = "spring")
+public interface BookMapper {
 
     /**
-     * Converts a BookEntity to a BookDTO.
-     *
-     * @param entity the BookEntity to convert
-     * @return the corresponding BookDTO
+     * Maps a BookRequestDTO to a BookEntity for persistence.
+     * <p>
+     * - Stub AuthorEntity is created from authorId.
+     * - BookDetailsEntity mapping is handled separately in service.
+     * </p>
+     * @param dto incoming request DTO
+     * @return mapped BookEntity
      */
-    public static BookRequestDTO toBookDTO(BookEntity entity) {
-        if (entity == null) return null;
-
-        return BookRequestDTO.builder()
-                .bookId(entity.getBookId())
-                .title(entity.getTitle())
-                .language(entity.getLanguage())
-                .genre(entity.getGenre())
-                .literaryForm(entity.getLiteraryForm())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .authorId(entity.getAuthor() != null ? entity.getAuthor().getAuthorId() : null)
-                .bookDetails(BookDetailsMapper.toBookDetailsDTO(entity.getBookDetails()))
-                .authorBooks(toAuthorBookDTOList(entity.getAuthorBooks()))
-                .build();
-    }
+    @Mapping(target = "author", source = "authorId", qualifiedByName = "mapAuthor")
+    @Mapping(target = "bookDetails", ignore = true)
+    BookEntity toEntity(BookRequestDTO dto);
 
     /**
-     * Converts a BookDTO to a BookEntity.
-     *
-     * @param dto the BookDTO to convert
-     * @return the corresponding BookEntity
+     * Updates an existing BookEntity in-place based on non-null fields from BookRequestDTO.
+     * <p>
+     * - Ignores nested author and details mappings; handle those in service.
+     * - Null properties in DTO will be skipped (no overwrite).
+     * </p>
+     * @param dto    the source request DTO
+     * @param entity the target managed BookEntity to update
      */
-    public static BookEntity toBookEntity(BookRequestDTO dto) {
-        if (dto == null) return null;
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "author", ignore = true)
+    @Mapping(target = "bookDetails", ignore = true)
+    void updateEntity(BookRequestDTO dto, @MappingTarget BookEntity entity);
 
-        BookEntity entity = new BookEntity();
-        entity.setBookId(dto.getBookId());
-        entity.setTitle(dto.getTitle());
-        entity.setLanguage(dto.getLanguage());
-        entity.setGenre(dto.getGenre());
-        entity.setLiteraryForm(dto.getLiteraryForm());
-        entity.setCreatedAt(dto.getCreatedAt());
-        entity.setUpdatedAt(dto.getUpdatedAt());
-        entity.setBookDetails(BookDetailsMapper.toBookDetailsEntity(dto.getBookDetails()));
+    /**
+     * Maps a BookEntity to a BookResponseDTO for client response.
+     * <p>
+     * - Author full name is concatenated.
+     * - Nested BookDetailsDTO is mapped from BookDetailsEntity.
+     * </p>
+     * @param entity persisted BookEntity
+     * @return outbound response DTO
+     */
+    @Mapping(target = "authorName", expression = "java(entity.getAuthor().getFirstName() + ' ' + entity.getAuthor().getLastName())")
+    @Mapping(target = "details", source = "bookDetails")
+    BookResponseDTO toResponse(BookEntity entity);
 
-        if (dto.getAuthorBooks() != null) {
-            List<AuthorBookEntity> authorBookEntities = toAuthorBookEntityList(dto.getAuthorBooks());
-            for (AuthorBookEntity abe : authorBookEntities) {
-                entity.addAuthorBook(abe);
-            }
+    /**
+     * Maps nested BookDetailsDTO to BookDetailsEntity.
+     */
+    BookDetailsEntity bookDetailsDtoToEntity(BookDetailsDTO dto);
+
+    /**
+     * Maps nested BookDetailsEntity to BookDetailsDTO.
+     */
+    BookDetailsDTO bookDetailsEntityToDto(BookDetailsEntity entity);
+
+    /**
+     * Creates an AuthorEntity with only its ID set, for mapping.
+     *
+     * @param authorId the ID of the author
+     * @return stub AuthorEntity
+     */
+    @Named("mapAuthor")
+    default AuthorEntity mapAuthor(Integer authorId) {
+        if (authorId == null) {
+            return null;
         }
-
-        return entity;
-    }
-
-    /**
-     * Converts a list of AuthorBookEntity to a list of AuthorBookDTO.
-     *
-     * @param entities the list of AuthorBookEntity
-     * @return the corresponding list of AuthorBookDTO
-     */
-    private static List<AuthorBookDTO> toAuthorBookDTOList(List<AuthorBookEntity> entities) {
-        if (entities == null) return null;
-
-        return entities.stream()
-                .map(entity -> AuthorBookDTO.builder()
-                        .authorId(entity.getAuthor() != null ? entity.getAuthor().getAuthorId() : null)
-                        .bookId(entity.getBook() != null ? entity.getBook().getBookId() : null)
-                        .createdAt(entity.getCreatedAt())
-                        .updatedAt(entity.getUpdatedAt())
-                        .build())
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Converts a list of AuthorBookDTO to a list of AuthorBookEntity.
-     *
-     * @param dtos the list of AuthorBookDTO
-     * @return the corresponding list of AuthorBookEntity
-     */
-    private static List<AuthorBookEntity> toAuthorBookEntityList(List<AuthorBookDTO> dtos) {
-        if (dtos == null) return null;
-
-        return dtos.stream()
-                .map(dto -> {
-                    AuthorBookEntity entity = new AuthorBookEntity();
-                    entity.setCreatedAt(dto.getCreatedAt());
-                    entity.setUpdatedAt(dto.getUpdatedAt());
-                    // Author and Book references must be set in the service layer.
-                    return entity;
-                })
-                .collect(Collectors.toList());
+        AuthorEntity author = new AuthorEntity();
+        author.setAuthorId(authorId);
+        return author;
     }
 }

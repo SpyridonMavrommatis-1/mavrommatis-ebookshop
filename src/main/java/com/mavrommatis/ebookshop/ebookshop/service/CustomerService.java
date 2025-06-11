@@ -1,58 +1,64 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.CustomerEntity;
-
+import com.mavrommatis.ebookshop.ebookshop.dto.CustomerRequestDTO;
+import com.mavrommatis.ebookshop.ebookshop.dto.CustomerResponseDTO;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Service interface for managing {@link CustomerEntity} entities.
- * Provides standard CRUD operations for customer management.
+ * Service interface for managing Customer operations via DTOs.
+ * <p>
+ * Defines methods for CRUD operations that accept and return DTOs,
+ * abstracting away persistence details from the client.
  */
 public interface CustomerService {
 
     /**
-     * Retrieve all customers from the database.
+     * Retrieve all customers.
      *
-     * @return a list of {@link CustomerEntity} entities
+     * @return list of {@link CustomerResponseDTO}
      */
-    List<CustomerEntity> findAll();
+    List<CustomerResponseDTO> findAll();
 
     /**
-     * Find a customer by their unique ID.
+     * Retrieve a specific customer by ID.
      *
-     * @param id the customer ID
-     * @return an {@link Optional} containing the customer if found, or empty if not
+     * @param id customer identifier
+     * @return {@link CustomerResponseDTO} of the found customer
+     * @throws RuntimeException if no customer is found
      */
-    Optional<CustomerEntity> findById(Integer id);
+    CustomerResponseDTO findById(Integer id);
 
     /**
-     * Save a new customer if they do not already exist.
+     * Create a new customer.
      *
-     * @param customer the customer to be saved
-     * @return the saved {@link CustomerEntity} entity
+     * @param dto the {@link CustomerRequestDTO} containing customer data
+     * @return {@link CustomerResponseDTO} of the created customer
      */
-    CustomerEntity save(CustomerEntity customer);
+    CustomerResponseDTO save(CustomerRequestDTO dto);
 
     /**
-     * Save a list of customers. If any of them already exist, an exception should be thrown in implementation.
+     * Update an existing customer.
      *
-     * @param customers the list of customers to save
-     * @return the list of saved {@link CustomerEntity} entities
+     * @param id  the ID of the customer to update
+     * @param dto the {@link CustomerRequestDTO} containing updated data
+     * @return {@link CustomerResponseDTO} of the updated customer
+     * @throws RuntimeException if no customer exists with the given ID
      */
-    List<CustomerEntity> saveAll(List<CustomerEntity> customers);
+    CustomerResponseDTO update(Integer id, CustomerRequestDTO dto);
 
     /**
-     * Delete a customer by their ID.
+     * Delete a customer by ID.
      *
-     * @param id the ID of the customer to delete
+     * @param id customer identifier
+     * @throws RuntimeException if no customer exists with the given ID
      */
     void deleteById(Integer id);
 
     /**
      * Delete multiple customers by their IDs.
      *
-     * @param ids a list of IDs corresponding to the customers to delete
+     * @param ids list of customer identifiers
+     * @throws RuntimeException if any ID is not found
      */
     void deleteAllById(List<Integer> ids);
 }

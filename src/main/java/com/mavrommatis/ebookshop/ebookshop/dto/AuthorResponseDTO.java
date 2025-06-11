@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;sddcψ
+import java.time.LocalDateTime;
 
 /**
  * DTO used for sending author information back to the client.
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;sddcψ
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-class AuthorResponseDTO {
+public class AuthorResponseDTO {
 
     /**
      * Unique identifier of the author.

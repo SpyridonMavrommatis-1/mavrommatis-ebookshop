@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthorBookDTO {
+public class AuthorBookResponseDTO {
 
     /**
      * The unique identifier of the author.

@@ -25,4 +25,9 @@ public class BookRequestDTO {
      * The ID of the author who wrote the book. Used for look-up.
      */
     private Integer authorId;
+
+    /**
+     * If present, the BookDetails to create/update in the same call.
+     */
+    private BookDetailsDTO details;
 }

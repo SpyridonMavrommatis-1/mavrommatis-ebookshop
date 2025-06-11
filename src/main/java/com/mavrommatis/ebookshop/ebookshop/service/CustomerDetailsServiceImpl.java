@@ -1,115 +1,105 @@
 package com.mavrommatis.ebookshop.ebookshop.service;
 
 import com.mavrommatis.ebookshop.ebookshop.dao.CustomerDetailsRepository;
+import com.mavrommatis.ebookshop.ebookshop.dto.CustomerDetailsDTO;
 import com.mavrommatis.ebookshop.ebookshop.entity.CustomerDetailsEntity;
+import com.mavrommatis.ebookshop.ebookshop.mapper.CustomerMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
- * Service implementation class for managing {@link CustomerDetailsEntity}.
- * Provides CRUD operations using {@link CustomerDetailsRepository}.
+ * Service implementation for {@link CustomerDetailsService}, handling CRUD operations
+ * and mapping between DTOs and entities via {@link CustomerMapper}.
  */
 @Service
 public class CustomerDetailsServiceImpl implements CustomerDetailsService {
 
-    private final CustomerDetailsRepository customerDetailsRepository;
+    private final CustomerDetailsRepository repository;
+    private final CustomerMapper mapper;
 
     /**
-     * Constructor-based injection of the CustomerDetailsRepository.
+     * Constructs a new CustomerDetailsServiceImpl with required dependencies.
      *
-     * @param customerDetailsRepository the repository for accessing customer details
+     * @param repository the repository for CustomerDetailsEntity persistence
+     * @param mapper     the mapper for converting between DTOs and entities
      */
-    public CustomerDetailsServiceImpl(CustomerDetailsRepository customerDetailsRepository) {
-        this.customerDetailsRepository = customerDetailsRepository;
+    public CustomerDetailsServiceImpl(CustomerDetailsRepository repository,
+                                      CustomerMapper mapper) {
+        this.repository = repository;
+        this.mapper     = mapper;
     }
 
     /**
-     * Retrieve all customer details records from the database.
-     *
-     * @return a list of {@link CustomerDetailsEntity}
+     * {@inheritDoc}
      */
     @Override
-    public List<CustomerDetailsEntity> findAll() {
-        return customerDetailsRepository.findAll();
+    public List<CustomerDetailsDTO> findAll() {
+        return repository.findAll().stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 
     /**
-     * Find a customer details record by ID.
-     *
-     * @param id the ID of the customer
-     * @return an {@link Optional} containing the customer details if found, or empty if not
+     * {@inheritDoc}
      */
     @Override
-    public Optional<CustomerDetailsEntity> findById(Integer id) {
-        return customerDetailsRepository.findById(id);
+    public CustomerDetailsDTO findById(Integer customerId) {
+        CustomerDetailsEntity entity = repository.findById(customerId)
+                .orElseThrow(() -> new RuntimeException("CustomerDetails not found: " + customerId));
+        return mapper.toDto(entity);
     }
 
     /**
-     * Save a new customer details record if it doesn't already exist.
-     *
-     * @param customerDetails the customer details to save
-     * @return the saved {@link CustomerDetailsEntity}
-     * @throws RuntimeException if a record with the same ID already exists
+     * {@inheritDoc}
      */
     @Override
-    public CustomerDetailsEntity save(CustomerDetailsEntity customerDetails) {
-        if (customerDetails.getCustomerId() != 0 &&
-                customerDetailsRepository.existsById(customerDetails.getCustomerId())) {
-            throw new RuntimeException("CustomerDetails already exists with id: " + customerDetails.getCustomerId());
+    @Transactional
+    public CustomerDetailsDTO save(CustomerDetailsDTO dto) {
+        CustomerDetailsEntity entity = mapper.toEntity(dto);
+        CustomerDetailsEntity saved = repository.save(entity);
+        return mapper.toDto(saved);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public List<CustomerDetailsDTO> saveAll(List<CustomerDetailsDTO> dtos) {
+        List<CustomerDetailsEntity> entities = dtos.stream()
+                .map(mapper::toEntity)
+                .collect(Collectors.toList());
+        List<CustomerDetailsEntity> saved = repository.saveAll(entities);
+        return saved.stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteById(Integer customerId) {
+        if (!repository.existsById(customerId)) {
+            throw new RuntimeException("CustomerDetails not found: " + customerId);
         }
-        return customerDetailsRepository.save(customerDetails);
+        repository.deleteById(customerId);
     }
 
     /**
-     * Save a list of customer details, ensuring none already exist by ID.
-     *
-     * @param customersDetails the list of customer details to save
-     * @return the saved list of {@link CustomerDetailsEntity}
-     * @throws RuntimeException if any of the records already exist
+     * {@inheritDoc}
      */
     @Override
-    public List<CustomerDetailsEntity> saveAll(List<CustomerDetailsEntity> customersDetails) {
-        for (CustomerDetailsEntity customerDetails : customersDetails) {
-            if (customerDetails.getCustomerId() != 0 &&
-                    customerDetailsRepository.existsById(customerDetails.getCustomerId())) {
-                throw new RuntimeException("CustomerDetails already exists with id: " + customerDetails.getCustomerId());
+    @Transactional
+    public void deleteAllById(List<Integer> customerIds) {
+        for (Integer id : customerIds) {
+            if (!repository.existsById(id)) {
+                throw new RuntimeException("CustomerDetails not found: " + id);
             }
         }
-        return customerDetailsRepository.saveAll(customersDetails);
-    }
-
-    /**
-     * Delete a customer details record by ID, if it exists.
-     *
-     * @param id the ID of the customer to delete
-     * @throws RuntimeException if the record is not found
-     */
-    @Override
-    public void deleteById(Integer id) {
-        Optional<CustomerDetailsEntity> customerDetails = customerDetailsRepository.findById(id);
-        if (customerDetails.isPresent()) {
-            customerDetailsRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("CustomerDetails not found with id: " + id);
-        }
-    }
-
-    /**
-     * Delete multiple customer records by ID, if they exist.
-     *
-     * @param ids the list of IDs to delete
-     * @throws RuntimeException if any of the records are not found
-     */
-    @Override
-    public void deleteAllById(List<Integer> ids) {
-        for (Integer id : ids) {
-            if (customerDetailsRepository.existsById(id)) {
-                customerDetailsRepository.deleteById(id);
-            } else {
-                throw new RuntimeException("CustomerDetails not found with id: " + id);
-            }
-        }
+        repository.deleteAllById(customerIds);
     }
 }
