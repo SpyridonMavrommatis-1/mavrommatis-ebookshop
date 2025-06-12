@@ -1,7 +1,7 @@
 package com.mavrommatis.ebookshop.ebookshop.mapper;
 
-import com.mavrommatis.ebookshop.ebookshop.dto.BookReviewRequestDTO;
-import com.mavrommatis.ebookshop.ebookshop.dto.BookReviewResponseDTO;
+import com.mavrommatis.ebookshop.ebookshop.dto.BookReviewsRequestDTO;
+import com.mavrommatis.ebookshop.ebookshop.dto.BookReviewsResponseDTO;
 import com.mavrommatis.ebookshop.ebookshop.entity.BookEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -25,12 +25,12 @@ public interface BookReviewsMapper {
     @Mapping(target = "reviewId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    com.mavrommatis.ebookshop.ebookshop.entity.BookReviewsEntity toEntity(BookReviewRequestDTO dto);
+    com.mavrommatis.ebookshop.ebookshop.entity.BookReviewsEntity toEntity(BookReviewsRequestDTO dto);
 
     /**
      * Maps BookReviewsEntity to BookReviewResponseDTO.
      */
-    BookReviewResponseDTO toResponse(com.mavrommatis.ebookshop.ebookshop.entity.BookReviewsEntity entity);
+    BookReviewsResponseDTO toResponse(com.mavrommatis.ebookshop.ebookshop.entity.BookReviewsEntity entity);
 
     /**
      * Creates a stub BookEntity based on its ID.

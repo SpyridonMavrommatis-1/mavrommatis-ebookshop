@@ -20,4 +20,12 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface BookReviewsRepository extends JpaRepository<BookReviewsEntity, Integer> {
+    /**
+     * Returns true if a review by the given customer for the given book already exists.
+     *
+     * @param bookId     the ID of the book
+     * @param customerId the ID of the customer
+     */
+    boolean existsByBook_bookIdAndCustomer_customerId(Integer bookId, Integer customerId);
 }
+
