@@ -47,7 +47,7 @@ public abstract class BaseSecurityConfig {
      * </ul>
      * <p>
      * Passwords are encoded using the configured {@link PasswordEncoder} (BCrypt).
-     * In production you would replace this with a database-backed {@link UserDetailsService}.
+     * In production, you would replace this with a database-backed {@link UserDetailsService}.
      * </p>
      *
      * @param encoder the PasswordEncoder bean used to hash the raw passwords

@@ -1,6 +1,6 @@
 package com.mavrommatis.ebookshop.ebookshop.dao;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.BookEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.basic.BookEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

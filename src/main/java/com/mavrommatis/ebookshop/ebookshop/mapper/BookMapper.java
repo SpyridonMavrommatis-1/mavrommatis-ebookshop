@@ -1,11 +1,38 @@
 package com.mavrommatis.ebookshop.ebookshop.mapper;
 
-import com.mavrommatis.ebookshop.ebookshop.dto.*;
-import com.mavrommatis.ebookshop.ebookshop.entity.*;
+import com.mavrommatis.ebookshop.ebookshop.dto.details.BookDetailsDTO;
+import com.mavrommatis.ebookshop.ebookshop.dto.request.BookRequestDTO;
+import com.mavrommatis.ebookshop.ebookshop.dto.response.BookResponseDTO;
+import com.mavrommatis.ebookshop.ebookshop.entity.details.BookDetailsEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.basic.AuthorEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.basic.BookEntity;
 import org.mapstruct.*;
 
 /**
- * Mapper for converting between Book entities and DTOs.
+ * MapStruct mapper interface for transforming {@link BookEntity} and related
+ * objects to and from their corresponding DTO representations.
+ *
+ * <p>This mapper encapsulates the logic for converting between:
+ * <ul>
+ *   <li>{@link BookRequestDTO} → {@link BookEntity}</li>
+ *   <li>{@link BookEntity} → {@link BookResponseDTO}</li>
+ *   <li>{@link BookDetailsDTO} ↔ {@link BookDetailsEntity}</li>
+ * </ul>
+ *
+ * <p>Some fields are handled specially:
+ * <ul>
+ *   <li>{@code author} is mapped from {@code authorId} using a stub {@link AuthorEntity}</li>
+ *   <li>{@code bookDetails} is mapped with helper methods, or ignored when not applicable</li>
+ * </ul>
+ *
+ * <p>This interface is a Spring-managed component and can be injected via
+ * dependency injection where needed.</p>
+ *
+ * @see BookEntity
+ * @see BookRequestDTO
+ * @see BookResponseDTO
+ * @see BookDetailsDTO
+ * @see BookDetailsEntity
  */
 @Mapper(componentModel = "spring")
 public interface BookMapper {

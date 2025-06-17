@@ -1,16 +1,38 @@
 package com.mavrommatis.ebookshop.ebookshop.mapper;
 
-import com.mavrommatis.ebookshop.ebookshop.dto.AuthorBookRequestDTO;
-import com.mavrommatis.ebookshop.ebookshop.dto.AuthorBookResponseDTO;
-import com.mavrommatis.ebookshop.ebookshop.entity.AuthorBookEntity;
-import com.mavrommatis.ebookshop.ebookshop.entity.AuthorEntity;
-import com.mavrommatis.ebookshop.ebookshop.entity.BookEntity;
+import com.mavrommatis.ebookshop.ebookshop.dto.request.AuthorBookRequestDTO;
+import com.mavrommatis.ebookshop.ebookshop.dto.response.AuthorBookResponseDTO;
+import com.mavrommatis.ebookshop.ebookshop.entity.basic.AuthorBookEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.basic.AuthorEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.basic.BookEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 /**
- * Mapper for converting between AuthorBook entities and DTOs.
+ * MapStruct mapper interface for converting between
+ * {@link com.mavrommatis.ebookshop.ebookshop.entity.basic.AuthorBookEntity AuthorBookEntity}
+ * and its corresponding request/response DTOs.
+ *
+ * <p>This mapper handles the transformation logic for the many-to-many relationship
+ * between {@link com.mavrommatis.ebookshop.ebookshop.entity.basic.AuthorEntity AuthorEntity}
+ * and {@link com.mavrommatis.ebookshop.ebookshop.entity.basic.BookEntity BookEntity},
+ * represented in the join table entity {@code AuthorBookEntity}.</p>
+ *
+ * <p>During mapping from request to entity:
+ * <ul>
+ *   <li>Only the IDs of related entities are used (stub Author and Book objects are created).</li>
+ *   <li>Timestamps are ignored, as they're managed by JPA lifecycle hooks.</li>
+ * </ul>
+ *
+ * <p>During mapping from entity to response:
+ * <ul>
+ *   <li>All relevant fields (IDs, timestamps) are extracted for outbound DTOs.</li>
+ * </ul>
+ *
+ * @see com.mavrommatis.ebookshop.ebookshop.dto.request.AuthorBookRequestDTO
+ * @see com.mavrommatis.ebookshop.ebookshop.dto.response.AuthorBookResponseDTO
+ * @see com.mavrommatis.ebookshop.ebookshop.entity.basic.AuthorBookEntity
  */
 @Mapper(componentModel = "spring")
 public interface AuthorBookMapper {
