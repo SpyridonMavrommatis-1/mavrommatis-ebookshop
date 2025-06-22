@@ -3,6 +3,7 @@ package com.mavrommatis.ebookshop.ebookshop.controller.api.basic;
 import com.mavrommatis.ebookshop.ebookshop.dto.request.CustomerRequestDTO;
 import com.mavrommatis.ebookshop.ebookshop.dto.response.CustomerResponseDTO;
 import com.mavrommatis.ebookshop.ebookshop.service.basic.CustomerService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,12 +51,12 @@ public class CustomerRestController {
     /**
      * Retrieve all customers.
      *<p>
-     *    Accessible to {@code EMPLOYEE} and {@code ADMIN} role.
+     *     Accessible to {@code CUSTOMER}, {@code EMPLOYEE} and {@code ADMIN} roles.
      *</p>
      * @return list of {@link CustomerResponseDTO}
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE', 'ADMIN')")
     public List<CustomerResponseDTO> findAll() {
         return customerService.findAll();
     }
@@ -87,11 +88,10 @@ public class CustomerRestController {
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
-    public ResponseEntity<CustomerResponseDTO> createCustomer(@RequestBody CustomerRequestDTO request) {
+    public ResponseEntity<CustomerResponseDTO> createCustomer(@RequestBody @Valid CustomerRequestDTO request) {
         CustomerResponseDTO created = customerService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
-
     /**
      * Update an existing customer.
      *<p>
@@ -105,11 +105,10 @@ public class CustomerRestController {
     @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
     public CustomerResponseDTO updateCustomer(
             @PathVariable Integer customerId,
-            @RequestBody CustomerRequestDTO request
+            @RequestBody @Valid CustomerRequestDTO request
     ) {
         return customerService.update(customerId, request);
     }
-
     /**
      * Delete a customer by ID.
      * <p>
@@ -149,7 +148,7 @@ public class CustomerRestController {
      */
     @PostMapping("/batch")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public List<CustomerResponseDTO> saveAllCustomers(@RequestBody List<CustomerRequestDTO> requests) {
+    public List<CustomerResponseDTO> saveAllCustomers(@RequestBody @Valid List<@Valid CustomerRequestDTO> requests) {
         return requests.stream()
                 .map(customerService::save)
                 .toList();

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 /**
  * Data Transfer Object (DTO) for sending book information to clients via API responses.
  *
- * <p>This DTO provides a flattened and simplified representation of a
+ * <p>This DTO provides a flattened and simplified representation of
  * {@link BookEntity}
  * along with select author and detail information.</p>
  *
@@ -21,6 +21,12 @@ import java.time.LocalDateTime;
  *   <li>{@code authorName} - the full name of the book's primary author</li>
  *   <li>{@link BookDetailsDTO} - optional detailed metadata for the book (e.g., description, pages, etc.)</li>
  * </ul>
+ *
+ * <p><strong>Note:</strong> This DTO is used exclusively for output and is never received as input from the client.
+ * Therefore, validation annotations are intentionally omitted.</p>
+ *
+ * <p>Its values are programmatically constructed by the server-side layers
+ * (typically using a Mapper from {@code BookEntity}), and as such do not require validation rules.</p>
  *
  * @see BookEntity
  * @see BookDetailsDTO

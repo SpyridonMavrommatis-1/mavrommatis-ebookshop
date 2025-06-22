@@ -3,6 +3,8 @@ package com.mavrommatis.ebookshop.ebookshop.dto.request;
 import com.mavrommatis.ebookshop.ebookshop.entity.basic.AuthorBookEntity;
 import com.mavrommatis.ebookshop.ebookshop.entity.basic.AuthorEntity;
 import com.mavrommatis.ebookshop.ebookshop.entity.basic.BookEntity;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,8 +35,12 @@ import lombok.NoArgsConstructor;
 public class AuthorBookRequestDTO {
 
     /** The unique identifier of the author. */
+    @NotNull(message = "Author ID is required")
+    @Positive(message = "Author ID must be a positive integer")
     private Integer authorId;
 
     /** The unique identifier of the book. */
+    @NotNull(message = "Book ID is required")
+    @Positive(message = "Book ID must be a positive integer")
     private Integer bookId;
 }

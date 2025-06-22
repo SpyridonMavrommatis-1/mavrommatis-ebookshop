@@ -1,7 +1,10 @@
 package com.mavrommatis.ebookshop.ebookshop.dto.details;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.details.CustomerDetailsEntity;
 import com.mavrommatis.ebookshop.ebookshop.entity.basic.CustomerEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.details.CustomerDetailsEntity;
+import com.mavrommatis.ebookshop.ebookshop.validator.annotation.ValidPhoneNumber;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,20 +39,28 @@ public class CustomerDetailsDTO {
     /**
      * Customer's first name.
      */
+    @NotBlank(message = "First name is required")
+    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
     private String firstName;
 
     /**
      * Customer's last name.
      */
+    @NotBlank(message = "Last name is required")
+    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
     private String lastName;
 
     /**
      * Customer's mailing address.
      */
+    @Size(max = 255, message = "Address cannot exceed 255 characters")
     private String address;
 
     /**
      * Customer's contact phone number.
      */
+    @Size(max = 20, message = "Phone number cannot exceed 20 digits")
+    @NotBlank(message = "Phone number is required")
+    @ValidPhoneNumber
     private String phone;
 }

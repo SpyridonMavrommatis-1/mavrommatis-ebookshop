@@ -4,9 +4,11 @@ import com.mavrommatis.ebookshop.ebookshop.dto.request.AuthorBookRequestDTO;
 import com.mavrommatis.ebookshop.ebookshop.dto.response.AuthorBookResponseDTO;
 import com.mavrommatis.ebookshop.ebookshop.service.basic.AuthorBookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -55,12 +57,12 @@ public class AuthorBookRestController {
      * Retrieve all author-book associations.
      *
      *<p>
-     *    Accessible to {@code CUSTOMER}, {@code EMPLOYEE} and {@code ADMIN} role.
+     *    Accessible to {@code EMPLOYEE} and {@code ADMIN} role.
      *</p>
      * @return a list of AuthorBookResponseDTO
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
     public List<AuthorBookResponseDTO> getAll() {
         return authorBookService.findAll();
     }
@@ -69,7 +71,7 @@ public class AuthorBookRestController {
      * Retrieve a specific author-book association by composite key.
      *
      *<p>
-     *     Accessible to {@code CUSTOMER}, {@code EMPLOYEE} and {@code ADMIN} role.
+     *     Accessible to {@code EMPLOYEE} and {@code ADMIN} role.
      *</p>
      *
      * @param authorId the author’s ID
@@ -77,88 +79,11 @@ public class AuthorBookRestController {
      * @return the matching AuthorBookResponseDTO
      */
     @GetMapping("/{authorId}/{bookId}")
-    @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
     public AuthorBookResponseDTO getById(
             @PathVariable Integer authorId,
             @PathVariable Integer bookId
     ) {
         return authorBookService.findById(authorId, bookId);
-    }
-
-    /**
-     * Connect an existing author with an existing book.
-     *<p>
-     * Accessible to {@code EMPLOYEE} and {@code ADMIN} role.
-     *</p>
-     *
-     * <p>
-     * Ensures both entities exist before creating the association.
-     * </p>
-     *
-     * @param request the composite key DTO of author and book
-     * @return the created AuthorBookResponseDTO
-     */
-    @PostMapping("/connect")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAnyRole('EMPLOYEE','ADMIN')")
-    public AuthorBookResponseDTO connect(@RequestBody AuthorBookRequestDTO request) {
-        return authorBookService.connect(request);
-    }
-
-    /**
-     * Connect multiple author-book associations in batch.
-     *
-     * <p>
-     * Accessible to {@code EMPLOYEE} and {@code ADMIN} role.
-     * </p>
-     * <p>
-     * Validates each pair, persists the link only if both Author and Book exist,
-     * and returns the list of created associations.
-     * </p>
-     *
-     * @param requests list of composite key DTOs to connect
-     * @return list of created AuthorBookResponseDTO
-     */
-    @PostMapping("/connect/batch")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAnyRole('EMPLOYEE','ADMIN')")
-    public List<AuthorBookResponseDTO> connectAll(@RequestBody List<AuthorBookRequestDTO> requests) {
-        return authorBookService.connectAll(requests);
-    }
-
-    /**
-     * Delete a specific author-book association.
-     *
-     * <p>
-     *     Accessible to {@code ADMIN} role.
-     * </p>
-     *
-     * @param authorId the author’s ID
-     * @param bookId   the book’s ID
-     */
-    @DeleteMapping("/{authorId}/{bookId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    public void delete(
-            @PathVariable Integer authorId,
-            @PathVariable Integer bookId
-    ) {
-        authorBookService.deleteById(authorId, bookId);
-    }
-
-    /**
-     * Delete multiple author-book associations in batch.
-     *
-     * <p>
-     *    Accessible to {@code ADMIN} role.
-     * </p>
-     *
-     * @param requests list of composite key DTOs to delete
-     */
-    @DeleteMapping("/batch")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    public void deleteBatch(@RequestBody List<AuthorBookRequestDTO> requests) {
-        authorBookService.deleteAll(requests);
     }
 }

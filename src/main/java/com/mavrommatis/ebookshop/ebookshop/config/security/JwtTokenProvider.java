@@ -37,7 +37,8 @@ public class JwtTokenProvider {
         Date expiry = new Date(now.getTime() + VALIDITY_MS);
 
         return Jwts.builder()
-                .setSubject(authentication.getName())
+                .setSubject(authentication.getName()) // sub
+                .claim("preferred_username", authentication.getName()) // extra explicit
                 .claim("scope", String.join(" ", roles))
                 .setIssuedAt(now)
                 .setExpiration(expiry)

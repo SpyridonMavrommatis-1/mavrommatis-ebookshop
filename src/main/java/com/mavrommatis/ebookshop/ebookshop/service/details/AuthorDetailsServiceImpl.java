@@ -3,6 +3,7 @@ package com.mavrommatis.ebookshop.ebookshop.service.details;
 import com.mavrommatis.ebookshop.ebookshop.dao.AuthorDetailsRepository;
 import com.mavrommatis.ebookshop.ebookshop.dto.details.AuthorDetailsDTO;
 import com.mavrommatis.ebookshop.ebookshop.entity.details.AuthorDetailsEntity;
+import com.mavrommatis.ebookshop.ebookshop.exception.author.AuthorDetailsNotFoundException;
 import com.mavrommatis.ebookshop.ebookshop.mapper.AuthorMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,25 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Service implementation for {@link AuthorDetailsService}, mapping via {@link AuthorMapper}.
- */
 @Service
 public class AuthorDetailsServiceImpl implements AuthorDetailsService {
 
     private final AuthorDetailsRepository repository;
     private final AuthorMapper mapper;
 
-    /**
-     * Constructor injection of repository and mapper.
-     *
-     * @param repository the DAO for AuthorDetailsEntity
-     * @param mapper     the mapper for DTO ⇄ Entity conversions
-     */
-    public AuthorDetailsServiceImpl(AuthorDetailsRepository repository,
-                                    AuthorMapper mapper) {
+    public AuthorDetailsServiceImpl(AuthorDetailsRepository repository, AuthorMapper mapper) {
         this.repository = repository;
-        this.mapper     = mapper;
+        this.mapper = mapper;
     }
 
     @Override
@@ -41,18 +32,15 @@ public class AuthorDetailsServiceImpl implements AuthorDetailsService {
     @Override
     public AuthorDetailsDTO findById(Integer authorId) {
         AuthorDetailsEntity entity = repository.findById(authorId)
-                .orElseThrow(() -> new RuntimeException("AuthorDetails not found: " + authorId));
+                .orElseThrow(() -> new AuthorDetailsNotFoundException(authorId));
         return mapper.toDto(entity);
     }
 
     @Override
     @Transactional
     public AuthorDetailsDTO save(AuthorDetailsDTO dto) {
-        // Map DTO → Entity
         AuthorDetailsEntity entity = mapper.toEntity(dto);
-        // Persist (insert or update)
         AuthorDetailsEntity saved = repository.save(entity);
-        // Map back → DTO
         return mapper.toDto(saved);
     }
 
@@ -62,6 +50,7 @@ public class AuthorDetailsServiceImpl implements AuthorDetailsService {
         List<AuthorDetailsEntity> entities = dtos.stream()
                 .map(mapper::toEntity)
                 .collect(Collectors.toList());
+
         List<AuthorDetailsEntity> saved = repository.saveAll(entities);
         return saved.stream()
                 .map(mapper::toDto)
@@ -71,7 +60,7 @@ public class AuthorDetailsServiceImpl implements AuthorDetailsService {
     @Override
     public void deleteById(Integer authorId) {
         if (!repository.existsById(authorId)) {
-            throw new RuntimeException("AuthorDetails not found: " + authorId);
+            throw new AuthorDetailsNotFoundException(authorId);
         }
         repository.deleteById(authorId);
     }
@@ -81,7 +70,7 @@ public class AuthorDetailsServiceImpl implements AuthorDetailsService {
     public void deleteAllById(List<Integer> authorIds) {
         for (Integer id : authorIds) {
             if (!repository.existsById(id)) {
-                throw new RuntimeException("AuthorDetails not found: " + id);
+                throw new AuthorDetailsNotFoundException(id);
             }
         }
         repository.deleteAllById(authorIds);

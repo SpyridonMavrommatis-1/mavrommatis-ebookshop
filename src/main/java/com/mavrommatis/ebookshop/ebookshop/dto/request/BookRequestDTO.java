@@ -1,6 +1,11 @@
 package com.mavrommatis.ebookshop.ebookshop.dto.request;
 
 import com.mavrommatis.ebookshop.ebookshop.dto.details.BookDetailsDTO;
+import com.mavrommatis.ebookshop.ebookshop.validator.annotation.ValidISBN;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,20 +34,37 @@ import lombok.NoArgsConstructor;
 @Builder
 public class BookRequestDTO {
 
+    @NotBlank(message = "Title is required")
+    @Size(min = 1, max = 100, message = "Title must be between 1 and 100 characters")
     private String title;
+
+    @NotBlank(message = "Language is required")
+    @Size(max = 50, message = "Language must be at most 50 characters")
     private String language;
+
+    @NotBlank(message = "Genre is required")
+    @Size(max = 50, message = "Genre must be at most 50 characters")
     private String genre;
+
+    @NotBlank(message = "Literary form is required")
+    @Size(max = 50, message = "Literary form must be at most 50 characters")
     private String literaryForm;
+
+    @NotBlank(message = "ISBN is required")
+    @ValidISBN
     private String isbn;
+
     private boolean isCollective;
 
     /**
      * The ID of the author who wrote the book. Used for look-up.
      */
+    @NotNull(message = "Author ID is required")
     private Integer authorId;
 
     /**
      * If present, the BookDetails to create/update in the same call.
      */
+    @Valid
     private BookDetailsDTO details;
 }

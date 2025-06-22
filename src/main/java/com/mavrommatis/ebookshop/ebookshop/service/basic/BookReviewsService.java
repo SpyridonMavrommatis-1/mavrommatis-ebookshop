@@ -55,16 +55,6 @@ public interface BookReviewsService {
      */
     void deleteById(Integer id);
 
-    /**
-     * Create multiple new book reviews in batch.
-     * <p>
-     * Validates that each (bookId, customerId) pair is unique before saving.
-     *
-     * @param dtos list of review DTOs to create
-     * @return list of created {@link BookReviewsResponseDTO}
-     * @throws RuntimeException if any review already exists
-     */
-    List<BookReviewsResponseDTO> saveAll(List<BookReviewsRequestDTO> dtos);
 
     /**
      * Delete multiple book reviews by their IDs.

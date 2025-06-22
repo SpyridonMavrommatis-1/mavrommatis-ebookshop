@@ -2,6 +2,7 @@ package com.mavrommatis.ebookshop.ebookshop.controller.api.details;
 
 import com.mavrommatis.ebookshop.ebookshop.dto.details.CustomerDetailsDTO;
 import com.mavrommatis.ebookshop.ebookshop.service.details.CustomerDetailsService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,7 +84,7 @@ public class CustomerDetailsRestController {
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
-    public ResponseEntity<CustomerDetailsDTO> create(@RequestBody CustomerDetailsDTO dto) {
+    public ResponseEntity<CustomerDetailsDTO> create(@RequestBody @Valid CustomerDetailsDTO dto) {
         CustomerDetailsDTO created = customerDetailsService.save(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -101,9 +102,8 @@ public class CustomerDetailsRestController {
     @PreAuthorize("hasAnyRole('CUSTOMER', 'EMPLOYEE', 'ADMIN')")
     public CustomerDetailsDTO update(
             @PathVariable Integer customerId,
-            @RequestBody CustomerDetailsDTO dto
+            @RequestBody @Valid CustomerDetailsDTO dto
     ) {
-        // Ensure ID consistency if DTO contains id at all
         return customerDetailsService.save(dto);
     }
 
@@ -146,7 +146,7 @@ public class CustomerDetailsRestController {
      */
     @PostMapping("/batch")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public List<CustomerDetailsDTO> batchSave(@RequestBody List<CustomerDetailsDTO> dtos) {
+    public List<CustomerDetailsDTO> batchSave(@RequestBody @Valid List<@Valid CustomerDetailsDTO> dtos) {
         return customerDetailsService.saveAll(dtos);
     }
 

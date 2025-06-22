@@ -24,6 +24,14 @@ import java.time.LocalDateTime;
  *
  * <p>The timestamps {@code createdAt} and {@code updatedAt} reflect the lifecycle of the customer record.</p>
  *
+ * <p><strong>Note:</strong> This class does <em>not</em> use validation annotations
+ * such as {@code @NotBlank} or {@code @Email} because it is populated
+ * exclusively by the server for response purposes.</p>
+ *
+ * <p>Validation constraints are only relevant to input-bound classes (e.g. request DTOs),
+ * where user-provided data must be checked before persistence. Here, data is
+ * serialized for outbound use, and thus considered trustworthy.</p>
+ *
  * @see CustomerEntity
  * @see CustomerDetailsDTO
  */

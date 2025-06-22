@@ -1,58 +1,118 @@
 package com.mavrommatis.ebookshop.ebookshop.dto.response;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.basic.BookReviewsEntity;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mavrommatis.ebookshop.ebookshop.dto.request.BookReviewsRequestDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
 
 /**
- * Data Transfer Object (DTO) for sending book review information to clients.
+ * DTO for exposing book review data to clients.
  *
- * <p>This DTO represents a flattened structure of a
- * {@link BookReviewsEntity}
- * and includes key review attributes along with references to the associated book and customer.</p>
+ * <p>This DTO is used in HTTP responses and populated server-side,
+ * hence <strong>does not require validation annotations</strong>.</p>
  *
- * <p>It encapsulates:</p>
- * <ul>
- *   <li>{@code reviewId} – unique identifier of the review</li>
- *   <li>{@code bookId} – the ID of the reviewed book</li>
- *   <li>{@code customerId} – the ID of the reviewer</li>
- *   <li>{@code rating} – numeric score representing the customer's evaluation</li>
- *   <li>{@code comment} – optional text feedback</li>
- *   <li>{@code createdAt}, {@code updatedAt} – timestamps for lifecycle tracking</li>
- * </ul>
+ * <p>Any necessary validation (e.g., for rating, comment content) is expected
+ * to be enforced on the corresponding request-side DTO {@link BookReviewsRequestDTO}.</p>
  *
- * <p>This DTO is used in API responses to expose review data in a client-safe format.</p>
- *
- * @see BookReviewsEntity
+ * <p>Additionally, this DTO uses logic to conditionally hide the fields
+ * {@code bookId} and {@code customerId} for users with the role {@code CUSTOMER}.</p>
  */
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class BookReviewsResponseDTO {
 
-    /** Unique identifier of the review */
     private Integer reviewId;
-
-    /** ID of the book */
     private Integer bookId;
-
-    /** ID of the customer */
     private Integer customerId;
-
-    /** Numeric rating (required) */
     private int rating;
-
-    /** Optional comment */
     private String comment;
-
-    /** Timestamp when the review was created */
     private LocalDateTime createdAt;
-
-    /** Timestamp when the review was last updated */
     private LocalDateTime updatedAt;
+
+    @JsonProperty("reviewId")
+    public Integer getReviewId() {
+        return reviewId;
+    }
+
+    @JsonProperty("rating")
+    public int getRating() {
+        return rating;
+    }
+
+    @JsonProperty("comment")
+    public String getComment() {
+        return comment;
+    }
+
+    @JsonProperty("createdAt")
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    @JsonProperty("updatedAt")
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    @JsonProperty("bookId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Integer getBookId() {
+        return isCustomer() ? null : bookId;
+    }
+
+    @JsonProperty("customerId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Integer getCustomerId() {
+        return isCustomer() ? null : customerId;
+    }
+
+    // Standard setters (για MapStruct)
+
+    public void setReviewId(Integer reviewId) {
+        this.reviewId = reviewId;
+    }
+
+    public void setBookId(Integer bookId) {
+        this.bookId = bookId;
+    }
+
+    public void setCustomerId(Integer customerId) {
+        this.customerId = customerId;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    private boolean isCustomer() {
+        try {
+            return SecurityContextHolder.getContext()
+                    .getAuthentication()
+                    .getAuthorities()
+                    .stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .anyMatch(role -> role.equals("ROLE_CUSTOMER"));
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

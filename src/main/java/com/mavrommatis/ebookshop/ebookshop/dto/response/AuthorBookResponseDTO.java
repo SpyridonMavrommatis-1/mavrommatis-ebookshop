@@ -23,6 +23,12 @@ import java.time.LocalDateTime;
  *   <li>{@code updatedAt} – the timestamp of the last modification</li>
  * </ul>
  *
+ * <p>
+ * No validation annotations are applied to this DTO because it is populated
+ * exclusively by the server and sent as a response. Clients do not submit data to it,
+ * so field-level constraints are not necessary or effective here.
+ * </p>
+ *
  * <p>This DTO is used in API responses to safely expose the relationship
  * without leaking internal JPA mappings or entity logic.</p>
  *

@@ -3,16 +3,12 @@ package com.mavrommatis.ebookshop.ebookshop.service.basic;
 import com.mavrommatis.ebookshop.ebookshop.dao.AuthorBookRepository;
 import com.mavrommatis.ebookshop.ebookshop.dao.AuthorRepository;
 import com.mavrommatis.ebookshop.ebookshop.dao.BookRepository;
-import com.mavrommatis.ebookshop.ebookshop.dto.request.AuthorBookRequestDTO;
 import com.mavrommatis.ebookshop.ebookshop.dto.response.AuthorBookResponseDTO;
 import com.mavrommatis.ebookshop.ebookshop.entity.basic.AuthorBookEntity;
 import com.mavrommatis.ebookshop.ebookshop.entity.helper.AuthorBookIdEntity;
-import com.mavrommatis.ebookshop.ebookshop.entity.basic.AuthorEntity;
-import com.mavrommatis.ebookshop.ebookshop.entity.basic.BookEntity;
 import com.mavrommatis.ebookshop.ebookshop.mapper.AuthorBookMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,105 +71,4 @@ public class AuthorBookServiceImpl implements AuthorBookService {
         return mapper.toResponse(entity);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Validates that both the author and the book exist before creating the link,
-     * and that the association does not already exist.
-     * </p>
-     */
-    @Override
-    @Transactional
-    public AuthorBookResponseDTO connect(AuthorBookRequestDTO dto) {
-        // 1. Ensure author exists
-        AuthorEntity author = authorRepository.findById(dto.getAuthorId())
-                .orElseThrow(() -> new RuntimeException(
-                        "Author not found: " + dto.getAuthorId()));
-
-        // 2. Ensure book exists
-        BookEntity book = bookRepository.findById(dto.getBookId())
-                .orElseThrow(() -> new RuntimeException(
-                        "Book not found: " + dto.getBookId()));
-
-        // 3. Prevent duplicate association
-        AuthorBookIdEntity pk = new AuthorBookIdEntity(dto.getAuthorId(), dto.getBookId());
-        if (repository.existsById(pk)) {
-            throw new RuntimeException(
-                    "Association already exists: authorId=" + dto.getAuthorId() +
-                            ", bookId=" + dto.getBookId());
-        }
-
-        // 4. Build & persist the association entity
-        AuthorBookEntity entity = new AuthorBookEntity(author, book);
-        AuthorBookEntity saved  = repository.save(entity);
-        return mapper.toResponse(saved);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Validates each pair in the list:
-     * - both Author and Book must exist
-     * - the association must not already exist
-     * Persists the link if valid, and returns the list of created associations.
-     * </p>
-     */
-    @Override
-    @Transactional
-    public List<AuthorBookResponseDTO> connectAll(List<AuthorBookRequestDTO> dtos) {
-        return dtos.stream().map(dto -> {
-            // validate existence
-            AuthorEntity author = authorRepository.findById(dto.getAuthorId())
-                    .orElseThrow(() -> new RuntimeException(
-                            "Author not found: " + dto.getAuthorId()));
-            BookEntity book = bookRepository.findById(dto.getBookId())
-                    .orElseThrow(() -> new RuntimeException(
-                            "Book not found: " + dto.getBookId()));
-
-            // prevent duplicate
-            AuthorBookIdEntity pk = new AuthorBookIdEntity(dto.getAuthorId(), dto.getBookId());
-            if (repository.existsById(pk)) {
-                throw new RuntimeException(
-                        "Association already exists: authorId=" + dto.getAuthorId() +
-                                ", bookId=" + dto.getBookId());
-            }
-
-            // map & save
-            AuthorBookEntity entity = new AuthorBookEntity(author, book);
-            AuthorBookEntity saved  = repository.save(entity);
-            return mapper.toResponse(saved);
-        }).collect(Collectors.toList());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void deleteById(Integer authorId, Integer bookId) {
-        AuthorBookIdEntity id = new AuthorBookIdEntity(authorId, bookId);
-        if (!repository.existsById(id)) {
-            throw new RuntimeException(
-                    "Association not found: authorId=" + authorId + ", bookId=" + bookId);
-        }
-        repository.deleteById(id);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional
-    public void deleteAll(List<AuthorBookRequestDTO> dtos) {
-        for (AuthorBookRequestDTO dto : dtos) {
-            AuthorBookIdEntity id = new AuthorBookIdEntity(dto.getAuthorId(), dto.getBookId());
-            if (!repository.existsById(id)) {
-                throw new RuntimeException(
-                        "Association not found: authorId=" + dto.getAuthorId() + ", bookId=" + dto.getBookId());
-            }
-        }
-        dtos.forEach(dto -> {
-            AuthorBookIdEntity id = new AuthorBookIdEntity(dto.getAuthorId(), dto.getBookId());
-            repository.deleteById(id);
-        });
-    }
 }

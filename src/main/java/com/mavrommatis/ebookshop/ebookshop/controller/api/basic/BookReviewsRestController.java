@@ -3,6 +3,7 @@ package com.mavrommatis.ebookshop.ebookshop.controller.api.basic;
 import com.mavrommatis.ebookshop.ebookshop.dto.request.BookReviewsRequestDTO;
 import com.mavrommatis.ebookshop.ebookshop.dto.response.BookReviewsResponseDTO;
 import com.mavrommatis.ebookshop.ebookshop.service.basic.BookReviewsService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -66,7 +67,7 @@ public class BookReviewsRestController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('CUSTOMER')")
-    public BookReviewsResponseDTO create(@RequestBody BookReviewsRequestDTO request) {
+    public BookReviewsResponseDTO create(@RequestBody @Valid BookReviewsRequestDTO request) {
         return bookReviewService.save(request);
     }
 
@@ -83,7 +84,7 @@ public class BookReviewsRestController {
     @PreAuthorize("hasAnyRole('CUSTOMER')")
     public BookReviewsResponseDTO update(
             @PathVariable Integer reviewsId,
-            @RequestBody BookReviewsRequestDTO request
+            @RequestBody @Valid BookReviewsRequestDTO request
     ) {
         return bookReviewService.update(reviewsId, request);
     }
@@ -97,28 +98,12 @@ public class BookReviewsRestController {
      */
     @DeleteMapping("/{reviewsId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAnyRole('CUSTOMER')")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
     public void delete(@PathVariable Integer reviewsId) {
         bookReviewService.deleteById(reviewsId);
     }
 
-    /**
-     * Create multiple new book reviews in batch.
-     * <p>
-     *    Accessible to {@code CUSTOMER} role.
-     * </p>
-     *
-     * @param requests list of review DTOs to create
-     * @return list of created {@link BookReviewsResponseDTO}
-     * @throws RuntimeException if any review violates the unique constraint
-     */
-    @PostMapping("/batch")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAnyRole('CUSTOMER')")
-    public List<BookReviewsResponseDTO> createBatch(
-            @RequestBody List<BookReviewsRequestDTO> requests) {
-        return bookReviewService.saveAll(requests);
-    }
+
 
     /**
      * Delete multiple book reviews in batch.

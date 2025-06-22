@@ -1,7 +1,8 @@
 package com.mavrommatis.ebookshop.ebookshop.dto.details;
 
-import com.mavrommatis.ebookshop.ebookshop.entity.details.BookDetailsEntity;
 import com.mavrommatis.ebookshop.ebookshop.entity.basic.BookEntity;
+import com.mavrommatis.ebookshop.ebookshop.entity.details.BookDetailsEntity;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,30 +39,39 @@ public class BookDetailsDTO {
     /**
      * Date the book was published.
      */
+    @PastOrPresent(message = "Publish date must be in the past or present")
     private LocalDate publishDate;
 
     /**
      * Total number of pages in the book.
      */
+    @Min(value = 1, message = "Page count must be at least 1")
+    @Max(value = 10000, message = "Page count must not exceed 10,000")
     private int pages;
 
     /**
      * Brief summary or description of the book's content.
      */
+    @Size(max = 2000, message = "Summary cannot exceed 2000 characters")
     private String summary;
 
     /**
      * Dimensions of the book (e.g., "21 x 14 x 2 cm").
      */
+    @Size(max = 100, message = "Dimensions must not exceed 100 characters")
     private String dimensions;
 
     /**
      * Type of book cover (e.g., "Hardcover", "Paperback").
      */
+
+    @Size(max = 50, message = "Cover type must not exceed 50 characters")
     private String coverType;
 
     /**
      * Weight of the book in kilograms.
      */
+    @DecimalMin(value = "0.0", inclusive = true, message = "Weight must be non-negative")
+    @Digits(integer = 2, fraction = 2, message = "Weight must be a valid decimal (max 2 decimal places)")
     private BigDecimal weight;
 }

@@ -1,11 +1,13 @@
 package com.mavrommatis.ebookshop.ebookshop.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mavrommatis.ebookshop.ebookshop.dto.details.AuthorDetailsDTO;
 import com.mavrommatis.ebookshop.ebookshop.entity.basic.AuthorEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 /**
@@ -24,6 +26,10 @@ import java.time.LocalDateTime;
  *
  * <p>Timestamps such as {@code createdAt} and {@code updatedAt} reflect entity lifecycle moments.</p>
  *
+ * <p><strong>Note:</strong> This DTO is exclusively used for output purposes. It is
+ * populated by the server and is <em>not subject to validation</em> since
+ * it is never received as input from client requests.</p>
+ *
  * @see AuthorEntity
  * @see AuthorDetailsDTO
  */
@@ -31,6 +37,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthorResponseDTO {
 
     /**

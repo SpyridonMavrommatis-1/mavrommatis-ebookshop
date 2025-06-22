@@ -13,43 +13,33 @@ import java.util.stream.Stream;
 
 /**
  * Custom JWT Authentication Converter that extracts authorities from the "scope" claim of a JWT token.
- * <p>
- * This class is responsible for translating JWT scopes (e.g., "ROLE_ADMIN ROLE_EMPLOYEE")
- * into {@link GrantedAuthority} objects that Spring Security uses for role-based authorization.
- * </p>
- *
- * Example:
- * <pre>
- * scope: "ROLE_ADMIN ROLE_CUSTOMER"
- * → [new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_CUSTOMER")]
- * </pre>
  */
 public class CustomJwtAuthenticationConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
-    /**
-     * Converts the "scope" claim from a JWT into a collection of {@link GrantedAuthority} instances.
-     *
-     * @param jwt the decoded JWT
-     * @return a collection of authorities derived from the "scope" claim, or an empty list if missing
-     */
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
         Object scope = jwt.getClaims().get("scope");
 
         if (scope instanceof String s) {
             return Stream.of(s.split(" "))
+                    .map(String::trim)
+                    .filter(auth -> !auth.isBlank())
+                    .map(SimpleGrantedAuthority::new) // already has "ROLE_" prefix
+                    .collect(Collectors.toList());
+        }
+
+        if (scope instanceof List<?> list) {
+            return list.stream()
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .map(String::trim)
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
         }
 
-        return List.of(); // No authorities if no scope claim
+        return List.of(); // no valid authorities
     }
 
-    /**
-     * Wraps this converter inside a {@link JwtAuthenticationConverter} and sets it as the authority extractor.
-     *
-     * @return a configured {@link JwtAuthenticationConverter} using this custom scope parser
-     */
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(this);

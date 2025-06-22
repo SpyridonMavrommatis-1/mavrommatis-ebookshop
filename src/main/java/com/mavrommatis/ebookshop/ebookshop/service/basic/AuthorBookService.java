@@ -1,6 +1,5 @@
 package com.mavrommatis.ebookshop.ebookshop.service.basic;
 
-import com.mavrommatis.ebookshop.ebookshop.dto.request.AuthorBookRequestDTO;
 import com.mavrommatis.ebookshop.ebookshop.dto.response.AuthorBookResponseDTO;
 
 import java.util.List;
@@ -31,41 +30,4 @@ public interface AuthorBookService {
      */
     AuthorBookResponseDTO findById(Integer authorId, Integer bookId);
 
-    /**
-     * Create a new author-book association.
-     *
-     * @param dto the {@link AuthorBookRequestDTO} containing authorId and bookId
-     * @return {@link AuthorBookResponseDTO} of the created relationship
-     */
-    AuthorBookResponseDTO connect(AuthorBookRequestDTO dto);
-
-    /**
-     * Create multiple author-book associations in batch.
-     * <p>
-     * Validates each pair, persists the link only if both Author and Book exist,
-     * and returns the list of created associations.
-     * </p>
-     *
-     * @param dtos list of {@link AuthorBookRequestDTO} to create
-     * @return list of {@link AuthorBookResponseDTO} of the created relationships
-     * @throws RuntimeException if any referenced Author or Book does not exist
-     */
-    List<AuthorBookResponseDTO> connectAll(List<AuthorBookRequestDTO> dtos);
-
-    /**
-     * Delete an existing author-book association.
-     *
-     * @param authorId the ID of the author
-     * @param bookId   the ID of the book
-     * @throws RuntimeException if the association does not exist
-     */
-    void deleteById(Integer authorId, Integer bookId);
-
-    /**
-     * Delete multiple author-book associations.
-     *
-     * @param dtos list of {@link AuthorBookRequestDTO} to delete
-     * @throws RuntimeException if any association does not exist
-     */
-    void deleteAll(List<AuthorBookRequestDTO> dtos);
 }

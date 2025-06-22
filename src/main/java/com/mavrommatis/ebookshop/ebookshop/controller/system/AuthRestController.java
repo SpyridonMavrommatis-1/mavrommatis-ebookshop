@@ -1,4 +1,4 @@
-package com.mavrommatis.ebookshop.ebookshop.controller.api.auth;
+package com.mavrommatis.ebookshop.ebookshop.controller.system;
 
 import com.mavrommatis.ebookshop.ebookshop.config.security.JwtTokenProvider;
 import lombok.Data;

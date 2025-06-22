@@ -1,10 +1,14 @@
 package com.mavrommatis.ebookshop.ebookshop.dto.details;
 
 import com.mavrommatis.ebookshop.ebookshop.entity.basic.AuthorEntity;
+import com.mavrommatis.ebookshop.ebookshop.validator.annotation.ValidURL;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 
@@ -35,15 +39,18 @@ public class AuthorDetailsDTO {
     /**
      * Short biography of the author.
      */
+    @Size(max = 1000, message = "Biography cannot exceed 1000 characters")
     private String biography;
 
     /**
      * Date of birth.
      */
+    @Past(message = "Birth date must be in the past")
     private LocalDate birthDate;
 
     /**
      * Personal website link of the author.
      */
+    @ValidURL
     private String website;
 }
