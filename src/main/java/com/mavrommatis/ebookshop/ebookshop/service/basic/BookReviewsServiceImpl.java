@@ -1,7 +1,8 @@
 package com.mavrommatis.ebookshop.ebookshop.service.basic;
 
-import com.mavrommatis.ebookshop.ebookshop.dao.BookReviewsRepository;
-import com.mavrommatis.ebookshop.ebookshop.dao.CustomerRepository;
+import com.mavrommatis.ebookshop.ebookshop.security.util.SecurityUtils;
+import com.mavrommatis.ebookshop.ebookshop.dao.basic.BookReviewsRepository;
+import com.mavrommatis.ebookshop.ebookshop.dao.basic.CustomerRepository;
 import com.mavrommatis.ebookshop.ebookshop.dto.request.BookReviewsRequestDTO;
 import com.mavrommatis.ebookshop.ebookshop.dto.response.BookReviewsResponseDTO;
 import com.mavrommatis.ebookshop.ebookshop.entity.basic.BookReviewsEntity;
@@ -13,13 +14,20 @@ import com.mavrommatis.ebookshop.ebookshop.mapper.BookReviewsMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Service implementation for managing book reviews.
+ * <p>
+ * Handles review creation, retrieval, updating, and deletion, with access control
+ * based on the current authenticated customer. It also ensures no duplicate reviews
+ * are submitted for the same book by the same user.
+ * </p>
+ */
 @Service
 public class BookReviewsServiceImpl implements BookReviewsService {
 
@@ -37,7 +45,7 @@ public class BookReviewsServiceImpl implements BookReviewsService {
     }
 
     private Integer getCurrentUserId() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        String username = SecurityUtils.getCurrentUsername();
         return customerRepository.findByUsername(username)
                 .orElseThrow(() -> new ReviewNotFoundException("Customer not found: " + username))
                 .getCustomerId();
@@ -46,7 +54,14 @@ public class BookReviewsServiceImpl implements BookReviewsService {
     @Override
     public List<BookReviewsResponseDTO> findAll() {
         return repository.findAll().stream()
-                .map(mapper::toResponse)
+                .map(entity -> {
+                    BookReviewsResponseDTO dto = mapper.toResponse(entity);
+                    if (SecurityUtils.isCustomer()) {
+                        dto.setBookId(null);
+                        dto.setCustomerId(null);
+                    }
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -54,7 +69,12 @@ public class BookReviewsServiceImpl implements BookReviewsService {
     public BookReviewsResponseDTO findById(Integer id) {
         BookReviewsEntity entity = repository.findById(id)
                 .orElseThrow(() -> new ReviewNotFoundException("Review not found: " + id));
-        return mapper.toResponse(entity);
+        BookReviewsResponseDTO dto = mapper.toResponse(entity);
+        if (SecurityUtils.isCustomer()) {
+            dto.setBookId(null);
+            dto.setCustomerId(null);
+        }
+        return dto;
     }
 
     @Override
@@ -73,7 +93,12 @@ public class BookReviewsServiceImpl implements BookReviewsService {
         entity.setCustomer(customer);
 
         BookReviewsEntity saved = repository.save(entity);
-        return mapper.toResponse(saved);
+        BookReviewsResponseDTO response = mapper.toResponse(saved);
+        if (SecurityUtils.isCustomer()) {
+            response.setBookId(null);
+            response.setCustomerId(null);
+        }
+        return response;
     }
 
     @Override
@@ -90,7 +115,12 @@ public class BookReviewsServiceImpl implements BookReviewsService {
         existing.setComment(dto.getComment());
 
         BookReviewsEntity updated = repository.save(existing);
-        return mapper.toResponse(updated);
+        BookReviewsResponseDTO response = mapper.toResponse(updated);
+        if (SecurityUtils.isCustomer()) {
+            response.setBookId(null);
+            response.setCustomerId(null);
+        }
+        return response;
     }
 
     @Override

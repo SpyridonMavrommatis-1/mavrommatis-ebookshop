@@ -21,10 +21,17 @@ import jakarta.validation.ConstraintValidatorContext;
  */
 public class ValidISBNValidator implements ConstraintValidator<ValidISBN, String> {
 
+    /**
+     * Validates whether the provided string is a valid ISBN.
+     *
+     * @param value   the input string to validate
+     * @param context the validation context
+     * @return {@code true} if the value is null, blank, or a valid ISBN-10/13; otherwise {@code false}
+     */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null || value.trim().isEmpty()) return true;
-        String isbn = value.replaceAll("[-\s]", "");
+        String isbn = value.replaceAll("[-\\s]", "");
 
         if (isbn.length() == 10) return isValidIsbn10(isbn);
         if (isbn.length() == 13) return isValidIsbn13(isbn);
@@ -32,6 +39,12 @@ public class ValidISBNValidator implements ConstraintValidator<ValidISBN, String
         return false;
     }
 
+    /**
+     * Validates ISBN-10 format using Modulo 11 checksum.
+     *
+     * @param isbn cleaned 10-character string without hyphens or spaces
+     * @return {@code true} if ISBN-10 is valid; otherwise {@code false}
+     */
     private boolean isValidIsbn10(String isbn) {
         int sum = 0;
         for (int i = 0; i < 9; i++) {
@@ -43,6 +56,12 @@ public class ValidISBNValidator implements ConstraintValidator<ValidISBN, String
         return sum % 11 == 0;
     }
 
+    /**
+     * Validates ISBN-13 format using Modulo 10 checksum.
+     *
+     * @param isbn cleaned 13-character string without hyphens or spaces
+     * @return {@code true} if ISBN-13 is valid; otherwise {@code false}
+     */
     private boolean isValidIsbn13(String isbn) {
         int sum = 0;
         for (int i = 0; i < 13; i++) {

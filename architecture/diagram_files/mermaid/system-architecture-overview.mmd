@@ -1,0 +1,56 @@
+graph LR
+
+    subgraph Web Layer
+        CONTROLLER[Controller Layer]
+    end
+
+    subgraph Service Layer
+        SERVICE[Service Layer]
+        EXCEPTIONS[Exception Handling]
+        AOP[AOP Logging]
+    end
+
+    subgraph Mapper Layer
+        MAPPER[MapStruct Mappers]
+    end
+
+    subgraph DTOs
+        DTO_REQ[Request DTOs]
+        DTO_RES[Response DTOs]
+    end
+
+    subgraph Data Layer
+        REPO[Repository Layer]
+        ENTITY[Entity Layer]
+    end
+
+    subgraph Infrastructure
+        SECURITY[Security Configuration]
+        JWT[JWT Decoder & Filters]
+        VALIDATION[Validation Annotations]
+        CONFIG[Application Configuration]
+    end
+
+%% Web Layer
+    CONTROLLER -->|extract JWT| JWT
+    JWT -->|applies filters| SECURITY
+    CONTROLLER -->|validate DTO| VALIDATION
+    CONFIG -->|configures| CONTROLLER
+    CONTROLLER -->|calls with RequestDTO| SERVICE
+    SERVICE -->|returns ResponseDTO| CONTROLLER
+
+%% Service Layer
+    CONFIG -->|injects config beans| SERVICE
+    SERVICE -->|handles via| EXCEPTIONS
+    SERVICE -->|logs to| AOP
+
+%% Mapping Layer
+    SERVICE -->|maps to Entity| MAPPER
+    MAPPER -->|uses| DTO_REQ
+    MAPPER -->|uses| DTO_RES
+    SERVICE <-->|maps from Entity| MAPPER
+
+%% Data Layer
+    SERVICE -->|saves Entity| REPO
+    REPO -->|persists| ENTITY
+    REPO -->|returns Entity| SERVICE

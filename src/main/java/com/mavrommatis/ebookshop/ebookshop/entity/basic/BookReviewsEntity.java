@@ -12,8 +12,9 @@ import java.time.LocalDateTime;
 /**
  * Represents a review written by a {@link CustomerEntity} for a {@link BookEntity}.
  * <p>
- * This entity is linked to both the customer who wrote the review and the book that was reviewed.
- * It also includes a numeric rating, an optional comment, and automatic timestamps for creation and update.
+ * Each review includes a numeric rating, an optional comment, and timestamps
+ * for creation and last update. It is associated with both the reviewer (customer)
+ * and the reviewed book via many-to-one relationships.
  */
 @Entity
 @Table(name = "book_reviews")
@@ -23,65 +24,50 @@ import java.time.LocalDateTime;
 @ToString(exclude = {"book", "customer"})
 public class BookReviewsEntity {
 
-    /**
-     * Unique identifier for each review.
-     */
+    /** Unique identifier for each review. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
     private int reviewId;
 
-    /**
-     * Reference to the reviewed book.
-     */
+    /** Reference to the reviewed book. */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "book_id", nullable = false)
     @JsonBackReference
     private BookEntity book;
 
-    /**
-     * Reference to the customer who submitted the review.
-     */
+    /** Reference to the customer who submitted the review. */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", nullable = false)
     @JsonBackReference
     private CustomerEntity customer;
 
     /**
      * The numeric rating provided by the customer (required).
+     * Typically ranges from 1 to 5.
      */
     @Column(name = "rating", nullable = false)
     private int rating;
 
-    /**
-     * The optional text comment of the review.
-     */
+    /** Optional comment text provided by the reviewer. */
     @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
 
-    /**
-     * Timestamp indicating when the review was created.
-     */
+    /** Timestamp indicating when the review was created. */
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    /**
-     * Timestamp indicating the last update to the review.
-     */
+    /** Timestamp indicating the last update to the review. */
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    /**
-     * Sets the creation timestamp before persisting the review.
-     */
+    /** Sets the creation timestamp before persisting the review. */
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
-    /**
-     * Sets the update timestamp before updating the review.
-     */
+    /** Sets the update timestamp before updating the review. */
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();

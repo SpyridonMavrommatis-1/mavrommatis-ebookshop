@@ -1,0 +1,18 @@
+graph TD
+    A[HTTP Request: POST /api/books] --> B[Spring Controller: BookController]
+    B --> C[Validate BookRequestDTO]
+    C --> D[BookServiceImpl]
+    D --> E[map DTO to BookEntity via BookMapper]
+    E --> F[Persist to DB via BookRepository]
+    F --> G[Return BookEntity]
+    G --> H[Map BookEntity to BookResponseDTO via BookMapper]
+    H --> I[Return HTTP 201 Response]
+
+%% Parallel processes
+    B --> J[SecurityContext: Extract JWT + Validate ROLE]
+    D --> K[AOP Logging: log method + time]
+    D --> L[Exception Handling: BookNotFoundException, etc.]
+
+    style J fill:#d44b,stroke:#000000,stroke-width:2px
+    style K fill:#d44b,stroke:#333,stroke-width:1px
+    style L fill:#d44b,stroke:#000000,stroke-width:2px

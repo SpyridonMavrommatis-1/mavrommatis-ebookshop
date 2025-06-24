@@ -1,0 +1,12 @@
+package com.mavrommatis.ebookshop.ebookshop.dao.basic;
+
+import com.mavrommatis.ebookshop.ebookshop.entity.basic.BookEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * Repository interface for Book entities.
+ * Provides methods for saving, updating, deleting and retrieving books.
+ */
+public interface BookRepository extends JpaRepository<BookEntity, Integer> {
+
+}

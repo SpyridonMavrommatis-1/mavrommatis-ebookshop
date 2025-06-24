@@ -1,6 +1,6 @@
 package com.mavrommatis.ebookshop.ebookshop.controller.system;
 
-import com.mavrommatis.ebookshop.ebookshop.config.security.JwtTokenProvider;
+import com.mavrommatis.ebookshop.ebookshop.security.jwt.JwtTokenProvider;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

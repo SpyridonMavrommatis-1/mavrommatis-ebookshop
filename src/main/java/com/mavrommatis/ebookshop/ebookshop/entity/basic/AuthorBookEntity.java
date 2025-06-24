@@ -27,6 +27,22 @@ import java.util.Objects;
 @ToString(exclude = {"author", "book"})
 public class AuthorBookEntity implements Serializable {
 
+    /**
+     * A fixed version identifier for this class, required when implementing {@link Serializable}.
+     *
+     * <p>By explicitly declaring a {@code serialVersionUID}, we ensure that the JVM will not
+     * auto-generate one every time the class is modified. This is particularly important in
+     * production environments where the application is deployed without a full restart — such as in
+     * hot-reload scenarios or rolling deployments — and the serialized form of the class may still
+     * be in use (e.g., in caches, sessions, or queues).
+     *
+     * <p>If the class is changed and no fixed Unique Identifier is defined, Java computes a new one on-the-fly
+     * based on the class's structure. This often causes deserialization to fail with
+     * {@link java.io.InvalidClassException} if the runtime expects the old version of the class.
+     *
+     * <p>Setting a static {@code serialVersionUID = 1L} locks the class version and prevents
+     * accidental incompatibility across versions during deployment or persistence cycles.
+     */
     private static final long serialVersionUID = 1L;
 
     /**

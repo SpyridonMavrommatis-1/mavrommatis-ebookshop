@@ -12,28 +12,50 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.time.LocalDateTime;
 
 /**
- * DTO for exposing book review data to clients.
+ * Data Transfer Object (DTO) used to expose book review information to API clients.
+ * <p>
+ * This class is primarily used in HTTP response bodies for endpoints
+ * such as GET, POST, PUT, and DELETE operations related to book reviews.
+ * </p>
  *
- * <p>This DTO is used in HTTP responses and populated server-side,
- * hence <strong>does not require validation annotations</strong>.</p>
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Role-based field filtering for sensitive fields</li>
+ *   <li>Exposes only client-safe information</li>
+ *   <li>Populated exclusively server-side</li>
+ * </ul>
  *
- * <p>Any necessary validation (e.g., for rating, comment content) is expected
- * to be enforced on the corresponding request-side DTO {@link BookReviewsRequestDTO}.</p>
+ * <p>
+ * The fields {@code bookId} and {@code customerId} are dynamically omitted
+ * from JSON responses if the authenticated user has the {@code ROLE_CUSTOMER} role.
+ * </p>
  *
- * <p>Additionally, this DTO uses logic to conditionally hide the fields
- * {@code bookId} and {@code customerId} for users with the role {@code CUSTOMER}.</p>
+ * @see BookReviewsRequestDTO for the corresponding input DTO
  */
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class BookReviewsResponseDTO {
 
+    /** Unique identifier of the review */
     private Integer reviewId;
+
+    /** Identifier of the reviewed book (hidden for CUSTOMER role) */
     private Integer bookId;
+
+    /** Identifier of the reviewer customer (hidden for CUSTOMER role) */
     private Integer customerId;
+
+    /** Numeric rating (1-5) given in the review */
     private int rating;
+
+    /** Optional comment left by the reviewer */
     private String comment;
+
+    /** Timestamp of when the review was created */
     private LocalDateTime createdAt;
+
+    /** Timestamp of the last update to the review */
     private LocalDateTime updatedAt;
 
     @JsonProperty("reviewId")
@@ -61,19 +83,29 @@ public class BookReviewsResponseDTO {
         return updatedAt;
     }
 
+    /**
+     * Gets the book ID if the current user is not a CUSTOMER.
+     *
+     * @return book ID or null if user has CUSTOMER role
+     */
     @JsonProperty("bookId")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public Integer getBookId() {
         return isCustomer() ? null : bookId;
     }
 
+    /**
+     * Gets the customer ID if the current user is not a CUSTOMER.
+     *
+     * @return customer ID or null if user has CUSTOMER role
+     */
     @JsonProperty("customerId")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public Integer getCustomerId() {
         return isCustomer() ? null : customerId;
     }
 
-    // Standard setters (για MapStruct)
+    // Setters (used for mapping and serialization)
 
     public void setReviewId(Integer reviewId) {
         this.reviewId = reviewId;
@@ -103,6 +135,11 @@ public class BookReviewsResponseDTO {
         this.updatedAt = updatedAt;
     }
 
+    /**
+     * Checks if the current authenticated user has the CUSTOMER role.
+     *
+     * @return true if user has ROLE_CUSTOMER, otherwise false
+     */
     private boolean isCustomer() {
         try {
             return SecurityContextHolder.getContext()

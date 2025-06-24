@@ -14,17 +14,15 @@ import java.util.List;
 
 /**
  * Represents an Author entity in the ebookshop system.
- * An author can have author details (1-1) and multiple books (1-many).
+ * An author may have detailed metadata, one or more books,
+ * and may also participate in collaborations via the AuthorBook join table.
  *
- * Each author:
+ * <p>Each author:
  * <ul>
- *     <li>Is associated with {@link AuthorDetailsEntity} for extra metadata</li>
- *     <li>Is associated with one {@link BookEntity} (one-to-many)</li>
+ *     <li>Has detailed personal info via {@link AuthorDetailsEntity} (one-to-one)</li>
+ *     <li>Is associated with one or more {@link BookEntity} (one-to-many)</li>
  *     <li>Participates in many-to-many relationships via {@link AuthorBookEntity}</li>
  * </ul>
- * @see AuthorDetailsEntity
- * @see BookEntity
- * @see AuthorBookEntity
  */
 @Entity
 @Table(name = "author")
@@ -34,67 +32,53 @@ import java.util.List;
 @ToString(exclude = {"authorDetails"})
 public class AuthorEntity {
 
-    /**
-     * The primary key of the author.
-     */
+    /** Primary key for the author entity. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "author_id")
     private int authorId;
 
-    /**
-     * The first name of the author.
-     */
+    /** First name of the author (required). */
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    /**
-     * The last name of the author.
-     */
+    /** Last name of the author (required). */
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    /**
-     * The author's email address.
-     */
+    /** Email address of the author (must be unique). */
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    /**
-     * The timestamp when the author was created.
-     */
+    /** Timestamp when the author was created (set automatically). */
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    /**
-     * The timestamp when the author was last updated.
-     */
+    /** Timestamp when the author was last updated (set automatically). */
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    /**
-     * One-to-one relation with AuthorDetailsEntity.
-     */
+    /** One-to-one relationship with author’s personal metadata. */
     @OneToOne(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private AuthorDetailsEntity authorDetails;
 
-    /**
-     * One-to-many relation with BookEntity.
-     */
+    /** One-to-many relationship with authored books. */
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<BookEntity> books = new ArrayList<>();
 
-    /**
-     * Many-to-many relation with AuthorBookEntity.
-     */
+    /** Many-to-many participation via AuthorBook relationship. */
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<AuthorBookEntity> authorBooks = new ArrayList<>();
 
     /**
-     * Constructor with first name and last name.
+     * Constructs a new AuthorEntity with basic identification info.
+     *
+     * @param firstName the first name
+     * @param lastName  the last name
+     * @param email     the unique email address
      */
     public AuthorEntity(String firstName, String lastName, String email) {
         this.firstName = firstName;
@@ -102,39 +86,39 @@ public class AuthorEntity {
         this.email = email;
     }
 
-    /**
-     * Sets the creation timestamp.
-     */
+    /** Sets the creation timestamp before the entity is persisted. */
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
-    /**
-     * Sets the update timestamp.
-     */
+    /** Updates the modification timestamp before updating the entity. */
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 
     /**
-     * Adds a book to the list and sets the back-reference.
+     * Adds a book to the author's collection and sets the reverse relationship.
+     *
+     * @param book the BookEntity to add
      */
     public void addBook(BookEntity book) {
         if (!books.contains(book)) {
             books.add(book);
-            book.setAuthor(this);
+            book.setAuthor(this); // maintain bidirectional consistency
         }
     }
 
     /**
-     * Adds an AuthorBook entry to the list and sets the back-reference.
+     * Adds an AuthorBook entry to represent a many-to-many participation.
+     *
+     * @param authorBook the AuthorBookEntity to add
      */
     public void addAuthorBook(AuthorBookEntity authorBook) {
         if (!authorBooks.contains(authorBook)) {
             authorBooks.add(authorBook);
-            authorBook.setAuthor(this);
+            authorBook.setAuthor(this); // maintain bidirectional consistency
         }
     }
 }

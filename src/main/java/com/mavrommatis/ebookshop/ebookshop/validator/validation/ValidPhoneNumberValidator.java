@@ -12,6 +12,8 @@ import jakarta.validation.ConstraintValidatorContext;
  *
  * <p>Null or empty values are considered valid, assuming presence is handled elsewhere
  * with {@code @NotBlank} or similar annotations.</p>
+ *
+ * @see ValidPhoneNumber
  */
 public class ValidPhoneNumberValidator implements ConstraintValidator<ValidPhoneNumber, String> {
 

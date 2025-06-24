@@ -13,13 +13,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 /**
  * Represents a Book entity stored in the database.
  * Each book has a unique identifier and is associated with one main author.
  * Additional information is handled via related entities such as BookDetailsEntity and AuthorBookEntity.
- * The main Book entity mapped to the 'book' table.
  * <p>
  * Each book:
  * <ul>
@@ -27,10 +24,7 @@ import java.util.List;
  *    <li>Can contain {@link BookDetailsEntity} for extra metadata (one-to-one)</li>
  *    <li>Participates in many-to-many relationships via {@link AuthorBookEntity}</li>
  * </ul>
- *<p>This entity is used for persistence and data transfer across the system.</p>
- * @see AuthorEntity
- * @see BookDetailsEntity
- * @see AuthorBookEntity
+ * <p>This entity is used for persistence and data transfer across the system.</p>
  */
 @Entity
 @Table(name = "book")
@@ -38,85 +32,61 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @ToString(exclude = {"author", "bookDetails"})
-
 public class BookEntity {
 
-    /**
-     * Unique identifier for the book (Primary Key).
-     */
+    /** Unique identifier for the book (Primary Key). */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_id")
     private int bookId;
 
-    /**
-     * Title of the book (cannot be null).
-     */
+    /** Title of the book (cannot be null). */
     @Column(name = "title", nullable = false, length = 255)
     private String title;
 
-    /**
-     * Language in which the book is written (cannot be null).
-     */
+    /** Language in which the book is written (cannot be null). */
     @Column(name = "language", nullable = false, length = 100)
     private String language;
 
-    /**
-     * Genre or category of the book (e.g., fantasy, thriller) (cannot be null).
-     */
+    /** Genre or category of the book (e.g., fantasy, thriller) (cannot be null). */
     @Column(name = "genre", nullable = false, length = 100)
     private String genre;
 
-    /**
-     * Literary form of the book (e.g., novel, poem, essay) (cannot be null).
-     */
+    /** Literary form of the book (e.g., novel, poem, essay) (cannot be null). */
     @Column(name = "literary_form", nullable = false, length = 100)
     private String literaryForm;
 
     /**
-     * ISBN code of the book (unique per author/collective combination).
+     * ISBN code of the book. Uniqueness may depend on the author's scope.
+     * Consider enforcing unique constraint only if ISBN is globally unique.
      */
     @Column(name = "isbn", nullable = false, length = 20)
     private String isbn;
 
-    /**
-     * Indicates whether the book is a collective work or not.
-     */
+    /** Indicates whether the book is a collective work or not. */
     @Column(name = "is_collective", nullable = false)
     private boolean isCollective = false;
 
-    /**
-     * Timestamp when the book was created (automatically set on persist).
-     */
+    /** Timestamp when the book was created (automatically set on persist). */
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    /**
-     * Timestamp when the book was last updated (automatically updated on change).
-     */
+    /** Timestamp when the book was last updated (automatically updated on change). */
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    /**
-     * Many-to-One relationship to the main author of the book.
-     * Every book must be associated with a single author.
-     */
+    /** Many-to-One relationship to the main author of the book. Required. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     @JsonBackReference
     private AuthorEntity author;
 
-    /**
-     * One-to-One relationship with the book's detailed metadata.
-     * Cascades operations and removes orphaned details automatically.
-     */
+    /** One-to-One relationship with the book's detailed metadata. */
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
     private BookDetailsEntity bookDetails;
 
-    /**
-     * One-to-Many relationship with intermediate AuthorBook entities (for many-to-many logic).
-     */
+    /** One-to-Many relationship with intermediate AuthorBook entities (for many-to-many logic). */
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<AuthorBookEntity> authorBooks = new ArrayList<>();
@@ -144,9 +114,7 @@ public class BookEntity {
         author.addBook(this);  // maintains bidirectional link
     }
 
-    /**
-     * Lifecycle callback to set the creation and update timestamps when the book is first persisted.
-     */
+    /** Lifecycle callback to set the creation and update timestamps when the book is first persisted. */
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
@@ -154,9 +122,7 @@ public class BookEntity {
         this.updatedAt = now;
     }
 
-    /**
-     * Lifecycle callback to update the timestamp when the book is modified.
-     */
+    /** Lifecycle callback to update the timestamp when the book is modified. */
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();

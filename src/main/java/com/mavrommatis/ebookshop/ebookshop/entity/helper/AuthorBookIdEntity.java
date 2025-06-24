@@ -20,8 +20,9 @@ import java.util.Objects;
  * <p>It is used by JPA for identifying rows in the 'author_book' join table that represents
  * a many-to-many relationship between authors and books.</p>
  *
- * <p>For correct behavior, it overrides {@link #equals(Object)} and {@link #hashCode()}
- * as required by JPA.</p>
+ * <p>This class implements {@link Serializable}, which is required for any key used as
+ * a JPA embedded ID. The {@code serialVersionUID} ensures version compatibility during
+ * serialization, especially important in distributed caching or persistence mechanisms.</p>
  *
  * @see com.mavrommatis.ebookshop.ebookshop.entity.basic.AuthorBookEntity
  */
@@ -29,14 +30,17 @@ import java.util.Objects;
 public class AuthorBookIdEntity implements Serializable {
 
     /**
-     * The ID of the associated author.
+     * Serial version UID to ensure class compatibility during serialization between a loaded class
+     * and the serialized object.
+     * Prevents InvalidClassException when structure changes without full redeployment.
      */
+    private static final long serialVersionUID = 1L;
+
+    /** The ID of the associated author. */
     @Column(name = "author_id")
     private int authorId;
 
-    /**
-     * The ID of the associated book.
-     */
+    /** The ID of the associated book. */
     @Column(name = "book_id")
     private int bookId;
 
@@ -57,48 +61,32 @@ public class AuthorBookIdEntity implements Serializable {
         this.bookId = bookId;
     }
 
-    /**
-     * Gets the ID of the author in this composite key.
-     *
-     * @return the author's ID
-     */
+    /** @return the author's ID in this composite key */
     public int getAuthorId() {
         return authorId;
     }
 
-    /**
-     * Sets the ID of the author in this composite key.
-     *
-     * @param authorId the new author's ID
-     */
+    /** @param authorId the new author's ID */
     public void setAuthorId(int authorId) {
         this.authorId = authorId;
     }
 
-    /**
-     * Gets the ID of the book in this composite key.
-     *
-     * @return the book's ID
-     */
+    /** @return the book's ID in this composite key */
     public int getBookId() {
         return bookId;
     }
 
-    /**
-     * Sets the ID of the book in this composite key.
-     *
-     * @param bookId the new book's ID
-     */
+    /** @param bookId the new book's ID */
     public void setBookId(int bookId) {
         this.bookId = bookId;
     }
 
     /**
-     * Determines if two composite keys are equal.
+     * Determines equality between two composite keys.
      * Equality is based on both {@code authorId} and {@code bookId}.
      *
      * @param o the object to compare
-     * @return true if both keys match on authorId and bookId
+     * @return true if both keys match
      */
     @Override
     public boolean equals(Object o) {

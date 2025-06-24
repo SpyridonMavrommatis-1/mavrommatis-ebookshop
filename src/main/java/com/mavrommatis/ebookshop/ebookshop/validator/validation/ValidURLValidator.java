@@ -10,7 +10,7 @@ import java.net.URL;
 /**
  * Validator implementation for the {@link ValidURL} annotation.
  *
- * <p>This class uses {@link java.net.URL} to check if a given string is:
+ * <p>This class uses {@link java.net.URL} to check if a given string is:</p>
  * <ul>
  *     <li>well-formed as a URL</li>
  *     <li>uses "http" or "https" as protocol</li>
@@ -24,6 +24,13 @@ import java.net.URL;
  */
 public class ValidURLValidator implements ConstraintValidator<ValidURL, String> {
 
+    /**
+     * Validates that the input string is a syntactically valid URL with an accepted protocol.
+     *
+     * @param value   the string to validate
+     * @param context the validation context
+     * @return {@code true} if the input is null/blank or a valid URL; otherwise {@code false}
+     */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null || value.trim().isEmpty()) return true;
