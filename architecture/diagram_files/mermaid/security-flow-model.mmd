@@ -1,0 +1,16 @@
+flowchart TD
+    A[Client<br>POST /api/authenticate] --> B[Auth Controller]
+    B --> C[JwtTokenProvider <br> → generateToken]
+C --> D[JWT with sub + scope]
+D --> E[Client stores JWT <br> to a local storage <br> e.g.  JWT
+Authorization Header]
+E --> F[Client sends JWT <br> Authorization Header]
+F --> G[SecurityFilterChain <br> with JwtAuthenticationFilter]
+G --> H[JwtDecoder <br> validates signature]
+H --> I[CustomJwtAuthenticationConverter<br>extracts scope to roles]
+I --> J[SecurityContextHolder <br> holds Authentication]
+J --> K[PreAuthorize Access Control <br> based on ROLEs]
+
+style A fill:#dad8,stroke:#333,stroke-width:5.5px
+style K fill:#DC143C,stroke:#333,stroke-width:5.5px
+style J fill:#DC143C,stroke:#333,stroke-width:5.5px
